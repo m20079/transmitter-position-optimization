@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "transmitter-position-optimization"
+version = "0.1.0"
+description = ""
+authors = ["m20079 <108270961+m20079@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+jax = {extras = ["cuda12"], version = "^0.4.38"}
+matplotlib = "^3.10.0"
+japanize-matplotlib = "^1.1.3"
+
+
+[tool.poetry.group.dev.dependencies]
+taskipy = "^1.14.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.taskipy.tasks]
+run = "python transmitter_position_optimization/main.py"
