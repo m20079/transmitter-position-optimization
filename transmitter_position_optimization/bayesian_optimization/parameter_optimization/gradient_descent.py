@@ -23,9 +23,7 @@ class GradientDescent(ParameterOptimization):
         self.learning_rate: int = learning_rate
         self.parameter_optimization: ParameterOptimization = parameter_optimization
 
-    def tree_flatten(
-        self,
-    ) -> tuple[tuple[int, int, ParameterOptimization], None]:
+    def tree_flatten(self: Self) -> tuple[tuple[int, int, ParameterOptimization], None]:
         return (
             (
                 self.count,

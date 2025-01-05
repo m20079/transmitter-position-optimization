@@ -31,7 +31,9 @@ class Propagation:
         self.standard_deviation: Array = jnp.asarray(standard_deviation, dtype=floating)
         self.seed: Array = jnp.asarray(seed, dtype=integer)
 
-    def tree_flatten(self) -> tuple[tuple[Array, Array, Array, Array, Array], None]:
+    def tree_flatten(
+        self: Self,
+    ) -> tuple[tuple[Array, Array, Array, Array, Array], None]:
         return (
             (
                 self.free_distance,

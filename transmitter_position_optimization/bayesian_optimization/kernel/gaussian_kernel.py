@@ -1,6 +1,7 @@
 from functools import partial
 from typing import Self
 
+import constant
 import jax
 import jax.numpy as jnp
 from bayesian_optimization.kernel.kernel import Kernel
@@ -46,7 +47,8 @@ class GaussianKernel(Kernel):
                     output_train_data,
                     self.del_k_del_parameter2(input1, input2, parameter),
                 ),
-            ]
+            ],
+            dtype=constant.floating,
         )
 
     @partial(jax.jit, static_argnums=(0,))
@@ -139,7 +141,8 @@ class GaussianKernel(Kernel):
                         ),
                     ),
                 ],
-            ]
+            ],
+            dtype=constant.floating,
         )
 
     @partial(jax.jit, static_argnums=(0,))
@@ -275,7 +278,8 @@ class GaussianTwoDimKernel(Kernel):
                     output_train_data,
                     self.del_k_del_parameter2(input1, input2, parameter),
                 ),
-            ]
+            ],
+            dtype=constant.floating,
         )
 
     @partial(jax.jit, static_argnums=(0,))
@@ -343,13 +347,13 @@ class DoubleGaussianTwoDimKernel(Kernel):
                 )
                 / parameter[1]
             )
-            + parameter[0]
+            + parameter[2]
             * jnp.exp(
                 -(
                     jnp.power(input1[2] - input2[2], 2)
                     + jnp.power(input1[3] - input2[3], 2)
                 )
-                / parameter[1]
+                / parameter[3]
             )
             + self.delta(
                 jnp.abs(input1[0] - input2[0])
@@ -358,6 +362,73 @@ class DoubleGaussianTwoDimKernel(Kernel):
                 + jnp.abs(input1[3] - input2[3])
             )
             * parameter[4]
+        )
+
+    @partial(jax.jit, static_argnums=(0,))
+    def gradient(
+        self: Self,
+        input1: Array,
+        input2: Array,
+        output_train_data: Array,
+        k_inv: Array,
+        parameter: Array,
+    ) -> Array:
+        return jnp.asarray([])
+
+    @partial(jax.jit, static_argnums=(0,))
+    def hessian_matrix(
+        self: Self,
+        input1: Array,
+        input2: Array,
+        output_train_data: Array,
+        k_inv: Array,
+        parameter: Array,
+    ) -> Array:
+        return jnp.asarray([])
+
+
+class TripleGaussianTwoDimKernel(Kernel):
+    @partial(jax.jit, static_argnums=(0,))
+    def function(
+        self: Self,
+        input1: Array,
+        input2: Array,
+        parameter: Array,
+    ) -> Array:
+        return (
+            parameter[0]
+            * jnp.exp(
+                -(
+                    jnp.power(input1[0] - input2[0], 2)
+                    + jnp.power(input1[1] - input2[1], 2)
+                )
+                / parameter[1]
+            )
+            + parameter[2]
+            * jnp.exp(
+                -(
+                    jnp.power(input1[2] - input2[2], 2)
+                    + jnp.power(input1[3] - input2[3], 2)
+                )
+                / parameter[3]
+            )
+            + parameter[4]
+            * jnp.exp(
+                -(
+                    jnp.power(input1[4] - input2[4], 2)
+                    + jnp.power(input1[5] - input2[5], 2)
+                )
+                / parameter[5]
+            )
+            + self.delta(
+                jnp.abs(input1[0] - input2[0])
+                + jnp.abs(input1[1] - input2[1])
+                + jnp.abs(input1[2] - input2[2])
+                + jnp.abs(input1[3] - input2[3])
+                + jnp.abs(input1[4] - input2[4])
+                + jnp.abs(input1[5] - input2[5])
+            )
+            * parameter[6]
         )
 
     @partial(jax.jit, static_argnums=(0,))

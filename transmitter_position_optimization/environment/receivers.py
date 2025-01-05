@@ -1,3 +1,5 @@
+from typing import Self
+
 import constant
 import jax
 import jax.numpy as jnp
@@ -18,7 +20,7 @@ class Receivers:
         self.noise_floor: Array = jnp.asarray(noise_floor, dtype=constant.floating)
         self.bandwidth: Array = jnp.asarray(bandwidth, dtype=constant.floating)
 
-    def tree_flatten(self) -> tuple[tuple[Array, Array, Array, Array], None]:
+    def tree_flatten(self: Self) -> tuple[tuple[Array, Array, Array, Array], None]:
         return (
             (
                 self.x_positions,

@@ -26,7 +26,7 @@ class MCMC(ParameterOptimization):
         self.parameter_optimization: ParameterOptimization = parameter_optimization
 
     def tree_flatten(
-        self,
+        self: Self,
     ) -> tuple[tuple[int, int, Array, ParameterOptimization], None]:
         return (
             (
@@ -115,11 +115,11 @@ class MCMC(ParameterOptimization):
             )
 
         init_val: tuple[Array, Array, Array, Array, Array] = (
-            jnp.asarray(0),
+            jnp.asarray(0, dtype=constant.integer),
             init_parameter,
-            jnp.array(-jnp.inf),
+            jnp.asarray(-jnp.inf, dtype=constant.floating),
             init_parameter,
-            jnp.array(-jnp.inf),
+            jnp.asarray(-jnp.inf, dtype=constant.floating),
         )
         (_, _, _, max_parameter, _), _ = jax.lax.scan(body_fun, init_val, parameter.T)
         return max_parameter

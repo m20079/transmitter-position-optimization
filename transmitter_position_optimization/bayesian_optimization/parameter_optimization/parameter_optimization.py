@@ -19,7 +19,7 @@ class ParameterOptimization:
     ) -> Array:
         pass
 
-    @jax.jit
+    @partial(jax.jit, static_argnums=(0,))
     def get_log_likelihood(
         self: Self,
         k: Array,

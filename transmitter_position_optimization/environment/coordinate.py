@@ -1,6 +1,7 @@
 from functools import partial
 from typing import Self
 
+import constant
 import jax
 import jax.numpy as jnp
 from constant import floating, integer
@@ -42,7 +43,8 @@ class Coordinate:
                 + (self.x_size / self.x_mesh.astype(floating) / 2.0),
                 y_indices.astype(floating) * self.y_size / self.y_mesh.astype(floating)
                 + (self.y_size / self.y_mesh.astype(floating) / 2.0),
-            ]
+            ],
+            dtype=constant.floating,
         )
 
     @partial(jax.jit, static_argnums=(0,))
@@ -55,7 +57,8 @@ class Coordinate:
             [
                 x_indices.astype(floating) * self.x_size / self.x_mesh.astype(floating),
                 y_indices.astype(floating) * self.y_size / self.y_mesh.astype(floating),
-            ]
+            ],
+            dtype=constant.floating,
         )
 
     @partial(jax.jit, static_argnums=(0,))
@@ -69,7 +72,7 @@ class Coordinate:
                 x_positions * self.x_mesh.astype(floating) / self.x_size,
                 y_positions * self.y_mesh.astype(floating) / self.y_size,
             ]
-        ).astype(integer)
+        ).astype(constant.integer)
 
     @partial(jax.jit, static_argnums=(0,))
     def convert_receiver_positions_to_indices(
@@ -82,7 +85,7 @@ class Coordinate:
                 x_positions * self.x_mesh.astype(floating) / self.x_size - 0.5,
                 y_positions * self.y_mesh.astype(floating) / self.y_size - 0.5,
             ]
-        ).astype(integer)
+        ).astype(constant.integer)
 
     @partial(jax.jit, static_argnums=(0, 1, 2))
     def create_random_receiver_positions(
@@ -140,7 +143,8 @@ class Coordinate:
             jnp.meshgrid(
                 receiver_positions.at[0].get(),
                 receiver_positions.at[1].get(),
-            )
+            ),
+            dtype=constant.floating,
         )
 
     @partial(jax.jit, static_argnums=(0,))
@@ -167,7 +171,8 @@ class Coordinate:
             jnp.meshgrid(
                 transmitter_positions.at[0].get(),
                 transmitter_positions.at[1].get(),
-            )
+            ),
+            dtype=constant.floating,
         )
 
     @partial(jax.jit, static_argnums=(0, 1, 2))
@@ -194,7 +199,8 @@ class Coordinate:
                     maxval=self.y_mesh + 1,
                     dtype=integer,
                 ),
-            ]
+            ],
+            dtype=constant.integer,
         )
 
     @partial(jax.jit, static_argnums=(0, 1))
@@ -206,7 +212,9 @@ class Coordinate:
         y_grid_size: Array = self.y_mesh // (number * 2)
         x_grid: Array = jnp.arange(1, number * 2, 2) * x_grid_size
         y_grid: Array = jnp.arange(1, number * 2, 2) * y_grid_size
-        return jnp.asarray(jnp.meshgrid(x_grid, y_grid)).reshape(2, -1)
+        return jnp.asarray(
+            jnp.meshgrid(x_grid, y_grid), dtype=constant.integer
+        ).reshape(2, -1)
 
     @partial(jax.jit, static_argnums=(0, 1, 2))
     def create_random_transmitter_positions(
@@ -220,7 +228,6 @@ class Coordinate:
             y_indices=y_indices,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
     def get_receivers_extent(
         self: Self,
     ) -> tuple[float, float, float, float]:
@@ -231,7 +238,6 @@ class Coordinate:
             0.0,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
     def get_transmitter_extent(
         self: Self,
     ) -> tuple[float, float, float, float]:

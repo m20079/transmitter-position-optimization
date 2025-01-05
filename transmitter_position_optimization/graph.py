@@ -1,3 +1,5 @@
+import math
+
 import japanize_matplotlib  # noqa: F401
 import matplotlib
 import matplotlib.cm
@@ -315,6 +317,11 @@ def plot_heatmap_histogram(
     color_label: str,
     x_label: str,
     y_label: str,
+    bins_value: int | None = None,
+    color_value_min: float | None = None,
+    color_value_max: float | None = None,
+    hist_value_min: int | None = None,
+    hist_value_max: int | None = None,
     transparent: bool = True,
 ) -> None:
     cmap: Colormap = matplotlib.colormaps.get_cmap("jet")
@@ -329,7 +336,11 @@ def plot_heatmap_histogram(
     for i in range(len(horizontal_value)):
         result[float(f"{rounded_color_value[i]:0.4f}")].append(horizontal_value[i])
 
-    bins: int = max(horizontal_value) - min(horizontal_value) + 1
+    bins: int = (
+        bins_value
+        if bins_value is not None
+        else max(horizontal_value) - min(horizontal_value) + 1
+    )
     fig: Figure = plt.figure()
 
     color_bar_ax: Axes = fig.add_subplot()
@@ -337,7 +348,12 @@ def plot_heatmap_histogram(
         ax=color_bar_ax,
         mappable=matplotlib.cm.ScalarMappable(
             norm=matplotlib.colors.Normalize(
-                vmin=min(color_value), vmax=max(color_value)
+                vmin=color_value_min
+                if color_value_min is not None
+                else min(color_value),
+                vmax=color_value_max
+                if color_value_max is not None
+                else max(color_value),
             ),
             cmap=cmap,
         ),
@@ -353,7 +369,89 @@ def plot_heatmap_histogram(
         bins=bins,
         stacked=True,
         color=color,
-        range=(min(horizontal_value) - 0.5, max(horizontal_value) + 0.5),
+        range=(
+            hist_value_min
+            if hist_value_min is not None
+            else (min(horizontal_value) - 0.5),
+            hist_value_max
+            if hist_value_max is not None
+            else (max(horizontal_value) + 0.5),
+        ),
+    )
+    hist_ax.set_xlabel(x_label, fontsize=15)
+    hist_ax.set_ylabel(y_label, fontsize=15)
+
+    fig.savefig(f"{file}", bbox_inches="tight", transparent=transparent)
+    plt.cla()
+    plt.close()
+
+
+def plot_reverse_heatmap_histogram(
+    file: str,
+    horizontal_value: list[float],
+    color_value: list[int],
+    color_label: str,
+    x_label: str,
+    y_label: str,
+    bins_value: int | None = None,
+    color_value_min: float | None = None,
+    color_value_max: float | None = None,
+    hist_value_min: int | None = None,
+    hist_value_max: int | None = None,
+    transparent: bool = True,
+) -> None:
+    cmap: Colormap = matplotlib.colormaps.get_cmap("jet")
+    color: list = []
+    result: dict[int, list[float]] = {}
+    for i in sorted(color_value):
+        if result.get(i) is None:
+            result[i] = []
+            color.append(cmap(int(i / max(color_value) * 256.0)))
+
+    for i in range(len(horizontal_value)):
+        result[color_value[i]].append(horizontal_value[i])
+
+    bins: int = (
+        bins_value
+        if bins_value is not None
+        else math.ceil(max(horizontal_value)) - math.floor(min(horizontal_value)) + 1
+    )
+    fig: Figure = plt.figure()
+
+    color_bar_ax: Axes = fig.add_subplot()
+    color_bar = matplotlib.colorbar.Colorbar(
+        ax=color_bar_ax,
+        mappable=matplotlib.cm.ScalarMappable(
+            norm=matplotlib.colors.Normalize(
+                vmin=color_value_min
+                if color_value_min is not None
+                else min(color_value),
+                vmax=color_value_max
+                if color_value_max is not None
+                else max(color_value),
+            ),
+            cmap=cmap,
+        ),
+        orientation="vertical",
+    )
+    color_bar.set_label(color_label, fontsize=15)
+    color_bar.ax.set_position((0.95, 0.08, 0.02, 0.8))
+
+    hist_ax: Axes = fig.add_subplot()
+    hist_ax.tick_params(direction="in", which="both")
+    hist_ax.hist(
+        x=result.values(),  # type: ignore
+        bins=bins,
+        stacked=True,
+        color=color,
+        range=(
+            hist_value_min
+            if hist_value_min is not None
+            else (min(horizontal_value) - 0.5),
+            hist_value_max
+            if hist_value_max is not None
+            else (max(horizontal_value) + 0.5),
+        ),
     )
     hist_ax.set_xlabel(x_label, fontsize=15)
     hist_ax.set_ylabel(y_label, fontsize=15)

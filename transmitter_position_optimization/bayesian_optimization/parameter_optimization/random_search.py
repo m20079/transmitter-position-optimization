@@ -16,23 +16,23 @@ class RandomSearch(ParameterOptimization):
         self,
         count: int,
         seed: int,
-        min_params: Array,  # TODO lower_bound
-        max_params: Array,  # TODO upper_bound
+        lower_bound: Array,
+        upper_bound: Array,
     ) -> None:
         self.count: int = count
         self.seed: int = seed
-        self.min_params: Array = min_params
-        self.max_params: Array = max_params
+        self.lower_bound: Array = lower_bound
+        self.upper_bound: Array = upper_bound
 
     def tree_flatten(
-        self,
+        self: Self,
     ) -> tuple[tuple[int, int, Array, Array], None]:
         return (
             (
                 self.count,
                 self.seed,
-                self.min_params,
-                self.max_params,
+                self.lower_bound,
+                self.upper_bound,
             ),
             None,
         )
@@ -48,7 +48,7 @@ class RandomSearch(ParameterOptimization):
         output_train_data: Array,
         kernel: Kernel,
     ) -> Array:
-        keys: Array = random.split(random.key(self.seed), self.min_params.size)
+        keys: Array = random.split(random.key(self.seed), self.lower_bound.size)
 
         parameter: Array = jax.vmap(
             lambda key, min_param, max_param: random.uniform(
@@ -57,7 +57,7 @@ class RandomSearch(ParameterOptimization):
                 minval=min_param,
                 maxval=max_param,
             )
-        )(keys, self.min_params, self.max_params)
+        )(keys, self.lower_bound, self.upper_bound)
 
         @jax.jit
         def body_fn(

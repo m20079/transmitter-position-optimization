@@ -25,7 +25,9 @@ class Transmitter:
         self.init_y_position: Array = jnp.asarray(init_y_position, dtype=floating)
         self.wavelength: Array = jnp.asarray(c / frequency, dtype=floating)
 
-    def tree_flatten(self) -> tuple[tuple[Array, Array, Array, Array, Array], None]:
+    def tree_flatten(
+        self: Self,
+    ) -> tuple[tuple[Array, Array, Array, Array, Array], None]:
         return (
             (
                 self.x_position,
