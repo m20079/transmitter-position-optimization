@@ -71,10 +71,13 @@ def single_transmitter_simulation(
         distance_error.append(result[1])
         data_rate_error.append(result[2])
 
-        print(f"search_count: {result[0]}")
-        print(f"distance_error: {result[1]}")
-        print(f"data_rate_error: {result[2]}")
-        print(f"Simulation {debug_name} {seed + 1}/{simulation_count} completed.")
+        print(f"search_count: {result[0]}", flush=True)
+        print(f"distance_error: {result[1]}", flush=True)
+        print(f"data_rate_error: {result[2]}", flush=True)
+        print(
+            f"Simulation {debug_name} {seed + 1}/{simulation_count} completed.",
+            flush=True,
+        )
 
     return search_count, distance_error, data_rate_error
 
@@ -151,11 +154,14 @@ def double_transmitter_simulation(
         each_distance_error.append(result[2][1])
         data_rate_error.append(result[3])
 
-        print(f"search_count: {result[0]}")
-        print(f"distance_error: {result[1]}")
-        print(f"each_distance_error: {result[2]}")
-        print(f"data_rate_error: {result[3]}")
-        print(f"Simulation {debug_name} {seed + 1}/{simulation_count} completed.")
+        print(f"search_count: {result[0]}", flush=True)
+        print(f"distance_error: {result[1]}", flush=True)
+        print(f"each_distance_error: {result[2]}", flush=True)
+        print(f"data_rate_error: {result[3]}", flush=True)
+        print(
+            f"Simulation {debug_name} {seed + 1}/{simulation_count} completed.",
+            flush=True,
+        )
 
     return search_count, distance_error, each_distance_error, data_rate_error
 
@@ -245,10 +251,13 @@ def triple_transmitter_simulation(
         each_distance_error.append(result[2][2])
         data_rate_error.append(result[3])
 
-        print(f"search_count: {result[0]}")
-        print(f"distance_error: {result[1]}")
-        print(f"each_distance_error: {result[2]}")
-        print(f"data_rate_error: {result[3]}")
-        print(f"Simulation {debug_name} {seed + 1}/{simulation_count} completed.")
+        print(f"search_count: {result[0]}", flush=True)
+        print(f"distance_error: {result[1]}", flush=True)
+        print(f"each_distance_error: {result[2]}", flush=True)
+        print(f"data_rate_error: {result[3]}", flush=True)
+        print(
+            f"Simulation {debug_name} {seed + 1}/{simulation_count} completed.",
+            flush=True,
+        )
 
     return search_count, distance_error, each_distance_error, data_rate_error
