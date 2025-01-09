@@ -262,3 +262,75 @@ class DoubleExponentialTwoDimKernel(Kernel):
         parameter: Array,
     ) -> Array:
         return jnp.asarray([])
+
+class TripleExponentialTwoDimKernel(Kernel):
+    @partial(jax.jit, static_argnums=(0,))
+    def function(
+        self: Self,
+        input1: Array,
+        input2: Array,
+        parameter: Array,
+    ) -> Array:
+        return (
+            parameter[0]
+            * jnp.exp(
+                -(
+                    jnp.sqrt(
+                        jnp.power(input1[0] - input2[0], 2)
+                        + jnp.power(input1[1] - input2[1], 2)
+                    )
+                )
+                / parameter[1]
+            )
+            + parameter[2]
+            * jnp.exp(
+                -(
+                    jnp.sqrt(
+                        jnp.power(input1[2] - input2[2], 2)
+                        + jnp.power(input1[3] - input2[3], 2)
+                    )
+                )
+                / parameter[3]
+            )
+            + parameter[4]
+            * jnp.exp(
+                -(
+                    jnp.sqrt(
+                        jnp.power(input1[4] - input2[4], 2)
+                        + jnp.power(input1[5] - input2[5], 2)
+                    )
+                )
+                / parameter[5]
+            )
+            + self.delta(
+                jnp.abs(input1[0] - input2[0])
+                + jnp.abs(input1[1] - input2[1])
+                + jnp.abs(input1[2] - input2[2])
+                + jnp.abs(input1[3] - input2[3])
+                + jnp.abs(input1[4] - input2[4])
+                + jnp.abs(input1[5] - input2[5])
+            )
+            * parameter[6]
+        )
+
+    @partial(jax.jit, static_argnums=(0,))
+    def gradient(
+        self: Self,
+        input1: Array,
+        input2: Array,
+        output_train_data: Array,
+        k_inv: Array,
+        parameter: Array,
+    ) -> Array:
+        return jnp.asarray([])
+
+    @partial(jax.jit, static_argnums=(0,))
+    def hessian_matrix(
+        self: Self,
+        input1: Array,
+        input2: Array,
+        output_train_data: Array,
+        k_inv: Array,
+        parameter: Array,
+    ) -> Array:
+        return jnp.asarray([])
