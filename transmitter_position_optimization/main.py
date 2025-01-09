@@ -25,15 +25,27 @@ from simulation import (
     single_transmitter_simulation,
     triple_transmitter_simulation,
 )
+from bayesian_optimization.kernel.kernel import Kernel
+from jax._src.pjit import JitWrapped
 
+from bayesian_optimization.kernel.exponential_kernel import DoubleExponentialTwoDimKernel, ExponentialTwoDimKernel
+from bayesian_optimization.kernel.matern3_kernel import DoubleMatern3TwoDimKernel, Matern3TwoDimKernel
+from bayesian_optimization.kernel.matern5_kernel import DoubleMatern5TwoDimKernel, Matern5TwoDimKernel
 
-def double_gaussian_grid_min_ucb():
-    debug_name = "double_gaussian_grid_am_ucb"
+def double_grid(
+        kernel: Kernel,
+        kernel_name: str,
+        evaluation: JitWrapped,
+        evaluation_name: str,
+        acquisition: JitWrapped,
+        acquisition_name: str,
+):
+    debug_name = f"single_grid_{kernel_name}_{evaluation_name}_{acquisition_name}"
     coordinate = Coordinate(
         x_size=20.0,
         y_size=20.0,
-        y_mesh=2,
-        x_mesh=2,
+        y_mesh=40,
+        x_mesh=40,
     )
     propagation = Propagation(
         seed=0,
@@ -42,44 +54,44 @@ def double_gaussian_grid_min_ucb():
         distance_correlation=10.0,
         standard_deviation=8.0,
     )
-    count, distance_error, each_distance_error, data_rate_error = (
-        double_transmitter_simulation(
+    count, distance_error,  data_rate_error = (
+        single_transmitter_simulation(
             coordinate=coordinate,
             propagation=propagation,
-            simulation_count=10,
+            simulation_count=1000,
             receiver_number=5,
             noise_floor=-90.0,
             bandwidth=20.0e6,
             frequency=2.4e9,
-            kernel=TripleGaussianTwoDimKernel(),
+            kernel=kernel,
             parameter_optimization=MCMC(
-                count=10,
+                count=1000,
                 seed=0,
                 sigma_params=jnp.asarray(
-                    [1.0, 1.0, 1.0, 1.0, 0.00001], dtype=constant.floating
+                    [1.0, 1.0,1.0, 1.0, 0.00001], dtype=constant.floating
                 ),
                 parameter_optimization=MCMC(
-                    count=10,
+                    count=1000,
                     seed=0,
                     sigma_params=jnp.asarray(
-                        [100.0, 100.0, 100.0, 100.0, 0.001],
+                        [100.0, 100.0,100.0, 100.0, 0.001],
                         dtype=constant.floating,
                     ),
                     parameter_optimization=RandomSearch(
-                        count=10,
+                        count=10000,
                         seed=0,
                         lower_bound=jnp.asarray(
-                            [0.0, 0.0, 0.0, 0.0, 0.0], dtype=constant.floating
+                            [0.0, 0.0,0.0, 0.0, 0.0], dtype=constant.floating
                         ),
                         upper_bound=jnp.asarray(
-                            [10000.0, 10000.0, 10000.0, 10000.0, 0.1],
+                            [10000.0, 10000.0,10000.0, 10000.0, 0.1],
                             dtype=constant.floating,
                         ),
                     ),
                 ),
             ),
-            evaluation_function=Evaluation.min,
-            acquisition_function=Acquisition.ucb(),
+            evaluation_function=evaluation,
+            acquisition_function=acquisition,
             init_indices_pattern="grid",
             init_indices_number=2,
             debug_name=debug_name,
@@ -127,7 +139,10 @@ def double_gaussian_grid_min_ucb():
 
 if __name__ == "__main__":
     jax.config.update("jax_numpy_dtype_promotion", "strict")
-    jax.config.update("jax_platforms", "cpu")
+    # jax.config.update("jax_platforms", "cpu")
     # jax.config.update("jax_enable_x64", True)
 
-    double_gaussian_grid_min_ucb()
+    double_grid(kernel=DoubleGaussianTwoDimKernel(), kernel_name="gaussian", evaluation=Evaluation.min, evaluation_name="min", acquisition=Acquisition.ucb(), acquisition_name="ucb")
+    double_grid(kernel=DoubleMatern3TwoDimKernel(), kernel_name="matern3", evaluation=Evaluation.min, evaluation_name="min", acquisition=Acquisition.ucb(), acquisition_name="ucb")
+    double_grid(kernel=DoubleMatern5TwoDimKernel(), kernel_name="matern5", evaluation=Evaluation.min, evaluation_name="min", acquisition=Acquisition.ucb(), acquisition_name="ucb")
+    double_grid(kernel=DoubleExponentialTwoDimKernel(), kernel_name="exp", evaluation=Evaluation.min, evaluation_name="min", acquisition=Acquisition.ucb(), acquisition_name="ucb")
