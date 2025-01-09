@@ -2,8 +2,8 @@ from typing import Final
 
 import jax.numpy as jnp
 
-integer: Final = jnp.int64
-floating: Final = jnp.float64
+integer: Final = jnp.int32
+floating: Final = jnp.float32
 
 # 0: fori_loop →　vmap
 # 1: vmap → vmap

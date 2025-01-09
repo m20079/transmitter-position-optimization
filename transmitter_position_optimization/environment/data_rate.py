@@ -249,8 +249,6 @@ class DataRate:
             fill_value=-1,
         )
 
-        print(max_evaluation)
-
         def arrange_indices(
             max_evaluation_index_i: Array,
             max_evaluation_index_j: Array,
