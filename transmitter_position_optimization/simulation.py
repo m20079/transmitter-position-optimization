@@ -3,8 +3,11 @@ from typing import Literal
 import jax.numpy as jnp
 from bayesian_optimization.bayesian_optimization import (
     double_transmitter_optimization,
+    double_transmitter_random,
     single_transmitter_optimization,
+    single_transmitter_random,
     triple_transmitter_optimization,
+    triple_transmitter_random,
 )
 from bayesian_optimization.kernel.kernel import Kernel
 from bayesian_optimization.parameter_optimization.parameter_optimization import (
@@ -14,6 +17,56 @@ from environment.coordinate import Coordinate
 from environment.propagation import Propagation
 from environment.receivers import Receivers
 from jax._src.pjit import JitWrapped
+
+
+def single_transmitter_random_simulation(
+    coordinate: Coordinate,
+    propagation: Propagation,
+    simulation_count: int,
+    receiver_number: int,
+    noise_floor: float,
+    bandwidth: float,
+    frequency: float,
+    search_number: int,
+    evaluation_function: JitWrapped,
+    debug_name: str,
+) -> tuple[list[int], list[float], list[float]]:
+    search_count: list[int] = []
+    distance_error: list[float] = []
+    data_rate_error: list[float] = []
+
+    for seed in range(simulation_count):
+        receivers: Receivers = coordinate.create_random_receivers(
+            seed=seed,
+            number=receiver_number,
+            noise_floor=noise_floor,
+            bandwidth=bandwidth,
+        )
+        result = single_transmitter_random(
+            propagation=propagation,
+            coordinate=coordinate,
+            receivers=receivers,
+            frequency=frequency,
+            init_x_position=float(coordinate.x_size / 2.0),
+            init_y_position=float(coordinate.y_size / 2.0),
+            evaluation_function=evaluation_function,
+            seed=seed,
+            number=search_number,
+        )
+
+        search_count.append(result[0])
+        distance_error.append(result[1])
+        data_rate_error.append(result[2])
+
+        print(f"search_count: {result[0]}", flush=True)
+        print(f"distance_error: {result[1]}", flush=True)
+        print(f"data_rate_error: {result[2]}", flush=True)
+        print(
+            f"Simulation {debug_name} {seed + 1}/{simulation_count} completed.",
+            flush=True,
+        )
+
+    return search_count, distance_error, data_rate_error
 
 
 def single_transmitter_simulation(
@@ -82,6 +135,67 @@ def single_transmitter_simulation(
     return search_count, distance_error, data_rate_error
 
 
+def double_transmitter_random_simulation(
+    coordinate: Coordinate,
+    propagation: Propagation,
+    simulation_count: int,
+    receiver_number: int,
+    noise_floor: float,
+    bandwidth: float,
+    frequency: float,
+    search_number: int,
+    evaluation_function: JitWrapped,
+    debug_name: str,
+) -> tuple[list[int], list[float], list[float], list[float], list[float]]:
+    search_count: list[int] = []
+    distance_error: list[float] = []
+    each_distance_error_a: list[float] = []
+    each_distance_error_b: list[float] = []
+    data_rate_error: list[float] = []
+
+    for seed in range(simulation_count):
+        receivers: Receivers = coordinate.create_random_receivers(
+            seed=seed,
+            number=receiver_number,
+            noise_floor=noise_floor,
+            bandwidth=bandwidth,
+        )
+        result = double_transmitter_random(
+            propagation=propagation,
+            coordinate=coordinate,
+            receivers=receivers,
+            frequency=frequency,
+            init_x_position=float(coordinate.x_size / 2.0),
+            init_y_position=float(coordinate.y_size / 2.0),
+            evaluation_function=evaluation_function,
+            seed=seed,
+            number=search_number,
+        )
+
+        search_count.append(result[0])
+        distance_error.append(result[1])
+        each_distance_error_a.append(result[2][0])
+        each_distance_error_b.append(result[2][1])
+        data_rate_error.append(result[3])
+
+        print(f"search_count: {result[0]}", flush=True)
+        print(f"distance_error: {result[1]}", flush=True)
+        print(f"each_distance_error: {result[2]}", flush=True)
+        print(f"data_rate_error: {result[3]}", flush=True)
+        print(
+            f"Simulation {debug_name} {seed + 1}/{simulation_count} completed.",
+            flush=True,
+        )
+
+    return (
+        search_count,
+        distance_error,
+        each_distance_error_a,
+        each_distance_error_b,
+        data_rate_error,
+    )
+
+
 def double_transmitter_simulation(
     coordinate: Coordinate,
     propagation: Propagation,
@@ -97,10 +211,11 @@ def double_transmitter_simulation(
     init_indices_pattern: Literal["random", "grid"],
     init_indices_number: int,
     debug_name: str,
-) -> tuple[list[int], list[float], list[float], list[float]]:
+) -> tuple[list[int], list[float], list[float], list[float], list[float]]:
     search_count: list[int] = []
     distance_error: list[float] = []
-    each_distance_error: list[float] = []
+    each_distance_error_a: list[float] = []
+    each_distance_error_b: list[float] = []
     data_rate_error: list[float] = []
 
     for seed in range(simulation_count):
@@ -150,8 +265,8 @@ def double_transmitter_simulation(
 
         search_count.append(result[0])
         distance_error.append(result[1])
-        each_distance_error.append(result[2][0])
-        each_distance_error.append(result[2][1])
+        each_distance_error_a.append(result[2][0])
+        each_distance_error_b.append(result[2][1])
         data_rate_error.append(result[3])
 
         print(f"search_count: {result[0]}", flush=True)
@@ -163,7 +278,77 @@ def double_transmitter_simulation(
             flush=True,
         )
 
-    return search_count, distance_error, each_distance_error, data_rate_error
+    return (
+        search_count,
+        distance_error,
+        each_distance_error_a,
+        each_distance_error_b,
+        data_rate_error,
+    )
+
+
+def triple_transmitter_random_simulation(
+    coordinate: Coordinate,
+    propagation: Propagation,
+    simulation_count: int,
+    receiver_number: int,
+    noise_floor: float,
+    bandwidth: float,
+    frequency: float,
+    search_number: int,
+    evaluation_function: JitWrapped,
+    debug_name: str,
+) -> tuple[list[int], list[float], list[float], list[float], list[float], list[float]]:
+    search_count: list[int] = []
+    distance_error: list[float] = []
+    each_distance_error_a: list[float] = []
+    each_distance_error_b: list[float] = []
+    each_distance_error_c: list[float] = []
+    data_rate_error: list[float] = []
+
+    for seed in range(simulation_count):
+        receivers: Receivers = coordinate.create_random_receivers(
+            seed=seed,
+            number=receiver_number,
+            noise_floor=noise_floor,
+            bandwidth=bandwidth,
+        )
+        result = triple_transmitter_random(
+            propagation=propagation,
+            coordinate=coordinate,
+            receivers=receivers,
+            init_x_position=float(coordinate.x_size / 2.0),
+            init_y_position=float(coordinate.y_size / 2.0),
+            frequency=frequency,
+            evaluation_function=evaluation_function,
+            seed=seed,
+            number=search_number,
+        )
+
+        search_count.append(result[0])
+        distance_error.append(result[1])
+        each_distance_error_a.append(result[2][0])
+        each_distance_error_b.append(result[2][1])
+        each_distance_error_c.append(result[2][2])
+        data_rate_error.append(result[3])
+
+        print(f"search_count: {result[0]}", flush=True)
+        print(f"distance_error: {result[1]}", flush=True)
+        print(f"each_distance_error: {result[2]}", flush=True)
+        print(f"data_rate_error: {result[3]}", flush=True)
+        print(
+            f"Simulation {debug_name} {seed + 1}/{simulation_count} completed.",
+            flush=True,
+        )
+
+    return (
+        search_count,
+        distance_error,
+        each_distance_error_a,
+        each_distance_error_b,
+        each_distance_error_c,
+        data_rate_error,
+    )
 
 
 def triple_transmitter_simulation(
@@ -181,10 +366,12 @@ def triple_transmitter_simulation(
     init_indices_pattern: Literal["random", "grid"],
     init_indices_number: int,
     debug_name: str,
-) -> tuple[list[int], list[float], list[float], list[float]]:
+) -> tuple[list[int], list[float], list[float], list[float], list[float], list[float]]:
     search_count: list[int] = []
     distance_error: list[float] = []
-    each_distance_error: list[float] = []
+    each_distance_error_a: list[float] = []
+    each_distance_error_b: list[float] = []
+    each_distance_error_c: list[float] = []
     data_rate_error: list[float] = []
 
     for seed in range(simulation_count):
@@ -246,9 +433,9 @@ def triple_transmitter_simulation(
 
         search_count.append(result[0])
         distance_error.append(result[1])
-        each_distance_error.append(result[2][0])
-        each_distance_error.append(result[2][1])
-        each_distance_error.append(result[2][2])
+        each_distance_error_a.append(result[2][0])
+        each_distance_error_b.append(result[2][1])
+        each_distance_error_c.append(result[2][2])
         data_rate_error.append(result[3])
 
         print(f"search_count: {result[0]}", flush=True)
@@ -260,4 +447,11 @@ def triple_transmitter_simulation(
             flush=True,
         )
 
-    return search_count, distance_error, each_distance_error, data_rate_error
+    return (
+        search_count,
+        distance_error,
+        each_distance_error_a,
+        each_distance_error_b,
+        each_distance_error_c,
+        data_rate_error,
+    )

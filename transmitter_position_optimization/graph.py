@@ -6,6 +6,7 @@ import matplotlib.cm
 import matplotlib.colorbar
 import matplotlib.colors
 import matplotlib.pyplot as plt
+import numpy as np
 from environment.coordinate import Coordinate
 from environment.receivers import Receivers
 from environment.transmitter import Transmitter
@@ -16,6 +17,7 @@ from matplotlib.colors import Colormap
 from matplotlib.figure import Figure
 from matplotlib.image import AxesImage
 from matplotlib.ticker import MultipleLocator
+from scipy.stats import gaussian_kde
 
 
 def plot_rssi_heatmap(
@@ -89,7 +91,7 @@ def plot_data_rate_heatmap_single(
             ax.text(
                 float(x_transmitter_positions[i]),
                 float(y_transmitter_positions[i]),
-                f"{i+1}",
+                f"{i + 1}",
                 color="white",
                 ha="center",
                 va="center_baseline",
@@ -153,7 +155,7 @@ def plot_data_rate_heatmap_double(
             ax.text(
                 float(x_transmitter_positions_a[i]),
                 float(y_transmitter_positions_a[i]),
-                f"{i+1}",
+                f"{i + 1}",
                 color="white",
                 alpha=0.5,
                 ha="center",
@@ -164,7 +166,7 @@ def plot_data_rate_heatmap_double(
             ax.scatter(
                 float(x_transmitter_positions_b[i]),
                 float(y_transmitter_positions_b[i]),
-                f"{i+1}",
+                f"{i + 1}",
                 color="green",
                 alpha=0.5,
                 ha="center",
@@ -240,7 +242,7 @@ def plot_data_rate_heatmap_triple(
             ax.text(
                 float(x_transmitter_positions_a[i]),
                 float(y_transmitter_positions_a[i]),
-                f"{i+1}",
+                f"{i + 1}",
                 color="white",
                 alpha=0.5,
                 ha="center",
@@ -251,7 +253,7 @@ def plot_data_rate_heatmap_triple(
             ax.text(
                 float(x_transmitter_positions_b[i]),
                 float(y_transmitter_positions_b[i]),
-                f"{i+1}",
+                f"{i + 1}",
                 color="green",
                 alpha=0.5,
                 ha="center",
@@ -262,7 +264,7 @@ def plot_data_rate_heatmap_triple(
             ax.text(
                 float(x_transmitter_positions_c[i]),
                 float(y_transmitter_positions_c[i]),
-                f"{i+1}",
+                f"{i + 1}",
                 color="blue",
                 alpha=0.5,
                 ha="center",
@@ -455,6 +457,68 @@ def plot_reverse_heatmap_histogram(
     )
     hist_ax.set_xlabel(x_label, fontsize=15)
     hist_ax.set_ylabel(y_label, fontsize=15)
+
+    fig.savefig(f"{file}", bbox_inches="tight", transparent=transparent)
+    plt.cla()
+    plt.close()
+
+
+def plot_box(
+    file: str,
+    data: list[list],
+    y_label: str,
+    x_tick_labels: list[str],
+    transparent: bool = True,
+) -> None:
+    fig: Figure = plt.figure()
+    ax: Axes = fig.add_subplot()
+    ax.boxplot(data)
+    ax.set_ylabel(y_label, fontsize=15)
+    ax.set_xticklabels(x_tick_labels)
+    fig.savefig(f"{file}", bbox_inches="tight", transparent=transparent)
+    plt.cla()
+    plt.close()
+
+
+def plot_scatter_density(
+    file: str,
+    x_value: list[float] | Array,
+    y_value: list[float] | Array,
+    color_label: str,
+    color_value_min: float | None = None,
+    color_value_max: float | None = None,
+    transparent: bool = True,
+) -> None:
+    cmap = plt.cm.get_cmap("jet")
+
+    xy = np.vstack([x_value, y_value])
+    z = gaussian_kde(xy)(xy)
+    idx = z.argsort()
+
+    fig: Figure = plt.figure(figsize=(5, 5))
+    ax: Axes = fig.add_subplot()
+    ax.scatter(x_value[idx], y_value[idx], c=z[idx], s=50, cmap=cmap)
+
+    print(xy)
+
+    color_bar_ax: Axes = fig.add_subplot()
+    color_bar = matplotlib.colorbar.Colorbar(
+        ax=color_bar_ax,
+        mappable=matplotlib.cm.ScalarMappable(
+            norm=matplotlib.colors.Normalize(
+                vmin=color_value_min
+                if color_value_min is not None
+                else min(z * len(x_value)),
+                vmax=color_value_max
+                if color_value_max is not None
+                else max(z * len(x_value)),
+            ),
+            cmap=cmap,
+        ),
+        orientation="vertical",
+    )
+    color_bar.set_label(color_label, fontsize=15)
+    color_bar.ax.set_position((0.95, 0.08, 0.02, 0.8))
 
     fig.savefig(f"{file}", bbox_inches="tight", transparent=transparent)
     plt.cla()
