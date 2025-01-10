@@ -54,6 +54,7 @@ from simulation import (
 def single_random_simulation(
     evaluation: JitWrapped,
     evaluation_name: str,
+    search_number: int,
 ) -> None:
     debug_name: str = f"single_random_{evaluation_name}"
     coordinate = Coordinate(
@@ -81,7 +82,7 @@ def single_random_simulation(
         noise_floor=-90.0,
         bandwidth=20.0e6,
         frequency=2.4e9,
-        search_number=30,
+        search_number=search_number,
         evaluation_function=evaluation,
         debug_name=debug_name,
     )
@@ -244,7 +245,11 @@ def single_simulation(
     )
 
 
-def double_random_simulation(evaluation: JitWrapped, evaluation_name: str):
+def double_random_simulation(
+    evaluation: JitWrapped,
+    evaluation_name: str,
+    search_number: int,
+) -> None:
     debug_name: str = f"double_random_{evaluation_name}"
     coordinate = Coordinate(
         x_size=20.0,
@@ -273,7 +278,7 @@ def double_random_simulation(evaluation: JitWrapped, evaluation_name: str):
         noise_floor=-90.0,
         bandwidth=20.0e6,
         frequency=2.4e9,
-        search_number=30,
+        search_number=search_number,
         evaluation_function=evaluation,
         debug_name=debug_name,
     )
@@ -352,7 +357,7 @@ def double_simulation(
     acquisition_name: str,
     pattern: Literal["grid", "random"],
 ) -> None:
-    debug_name = f"double_{pattern}_{kernel_name}_{evaluation_name}_{acquisition_name}"
+    debug_name: str = f"double_{pattern}_{kernel_name}_{evaluation_name}_{acquisition_name}"
     coordinate = Coordinate(
         x_size=20.0,
         y_size=20.0,
@@ -479,7 +484,7 @@ def double_simulation(
     )
 
 
-def triple_random_simulation(evaluation: JitWrapped, evaluation_name: str):
+def triple_random_simulation(evaluation: JitWrapped, evaluation_name: str, search_number: int) -> None:
     debug_name: str = f"triple_random_{evaluation_name}"
     coordinate = Coordinate(
         x_size=20.0,
@@ -509,7 +514,7 @@ def triple_random_simulation(evaluation: JitWrapped, evaluation_name: str):
         noise_floor=-90.0,
         bandwidth=20.0e6,
         frequency=2.4e9,
-        search_number=30,
+        search_number=search_number,
         evaluation_function=evaluation,
         debug_name=debug_name,
     )
@@ -754,6 +759,7 @@ if __name__ == "__main__":
     double_random_simulation(
         evaluation=Evaluation.min,
         evaluation_name="min",
+        search_number=30,
     )
 
     # double_simulation(
