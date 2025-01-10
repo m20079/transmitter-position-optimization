@@ -497,21 +497,17 @@ def plot_scatter_density(
 
     fig: Figure = plt.figure(figsize=(5, 5))
     ax: Axes = fig.add_subplot()
-    ax.scatter(x_value[idx], y_value[idx], c=z[idx], s=50, cmap=cmap)
-
-    print(xy)
+    ax.scatter(
+        np.array(x_value)[idx], np.array(y_value)[idx], c=z[idx], s=50, cmap=cmap
+    )
 
     color_bar_ax: Axes = fig.add_subplot()
     color_bar = matplotlib.colorbar.Colorbar(
         ax=color_bar_ax,
         mappable=matplotlib.cm.ScalarMappable(
             norm=matplotlib.colors.Normalize(
-                vmin=color_value_min
-                if color_value_min is not None
-                else min(z * len(x_value)),
-                vmax=color_value_max
-                if color_value_max is not None
-                else max(z * len(x_value)),
+                vmin=color_value_min if color_value_min is not None else min(z),
+                vmax=color_value_max if color_value_max is not None else max(z),
             ),
             cmap=cmap,
         ),
