@@ -56,7 +56,7 @@ def single_random_simulation(
     evaluation_name: str,
     search_number: int,
 ) -> None:
-    debug_name: str = f"single_random_{evaluation_name}"
+    debug_name: str = f"single_random{search_number}_{evaluation_name}"
     coordinate = Coordinate(
         x_size=20.0,
         y_size=20.0,
@@ -250,7 +250,7 @@ def double_random_simulation(
     evaluation_name: str,
     search_number: int,
 ) -> None:
-    debug_name: str = f"double_random_{evaluation_name}"
+    debug_name: str = f"double_random{search_number}_{evaluation_name}"
     coordinate = Coordinate(
         x_size=20.0,
         y_size=20.0,
@@ -357,7 +357,9 @@ def double_simulation(
     acquisition_name: str,
     pattern: Literal["grid", "random"],
 ) -> None:
-    debug_name: str = f"double_{pattern}_{kernel_name}_{evaluation_name}_{acquisition_name}"
+    debug_name: str = (
+        f"double_{pattern}_{kernel_name}_{evaluation_name}_{acquisition_name}"
+    )
     coordinate = Coordinate(
         x_size=20.0,
         y_size=20.0,
@@ -484,8 +486,12 @@ def double_simulation(
     )
 
 
-def triple_random_simulation(evaluation: JitWrapped, evaluation_name: str, search_number: int) -> None:
-    debug_name: str = f"triple_random_{evaluation_name}"
+def triple_random_simulation(
+    evaluation: JitWrapped,
+    evaluation_name: str,
+    search_number: int,
+) -> None:
+    debug_name: str = f"triple_random{search_number}_{evaluation_name}"
     coordinate = Coordinate(
         x_size=20.0,
         y_size=20.0,
