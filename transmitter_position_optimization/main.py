@@ -3,12 +3,11 @@ from typing import Literal
 import constant
 import jax
 import jax.numpy as jnp
-from bayesian_optimization.acquisition import (
-    Acquisition,
-)
+from bayesian_optimization.acquisition import Acquisition
 from bayesian_optimization.kernel.exponential_kernel import (
     DoubleExponentialTwoDimKernel,
     ExponentialTwoDimKernel,
+    TripleExponentialTwoDimKernel,
 )
 from bayesian_optimization.kernel.gaussian_kernel import (
     DoubleGaussianTwoDimKernel,
@@ -19,10 +18,12 @@ from bayesian_optimization.kernel.kernel import Kernel
 from bayesian_optimization.kernel.matern3_kernel import (
     DoubleMatern3TwoDimKernel,
     Matern3TwoDimKernel,
+    TripleMatern3TwoDimKernel,
 )
 from bayesian_optimization.kernel.matern5_kernel import (
     DoubleMatern5TwoDimKernel,
     Matern5TwoDimKernel,
+    TripleMatern5TwoDimKernel,
 )
 from bayesian_optimization.parameter_optimization.mcmc import (
     MCMC,
@@ -761,12 +762,6 @@ if __name__ == "__main__":
     jax.config.update("jax_numpy_dtype_promotion", "strict")
     # jax.config.update("jax_enable_x64", True)
     jax.config.update("jax_platforms", "cpu")
-
-    double_random_simulation(
-        evaluation=Evaluation.min,
-        evaluation_name="min",
-        search_number=30,
-    )
 
     # double_simulation(
     #     kernel=DoubleGaussianTwoDimKernel(),

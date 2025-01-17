@@ -27,9 +27,9 @@ class PolynomialKernel(Kernel):
         parameter: Array,
     ) -> Array:
         input_abs: Array = jnp.abs(input1[0] - input2[0])
-        return (input1[0] * input2[0] + parameter[0]) ** self.power + self.delta(
-            input_abs
-        ) * parameter[1]
+        return (
+            input1[0] * input2[0] * parameter[0] + parameter[1]
+        ) ** self.power + self.delta(input_abs) * parameter[2]
 
     @partial(jax.jit, static_argnums=(0,))
     def gradient(
@@ -77,8 +77,10 @@ class PolynomialTwoDimKernel(Kernel):
             jnp.power(input1[0] - input2[0], 2) + jnp.power(input1[1] - input2[1], 2)
         )
         return (
-            input1[0] * input2[0] + input1[1] * input2[1] + parameter[0]
-        ) ** self.power + self.delta(input_abs) * parameter[1]
+            input1[0] * input2[0] * parameter[0]
+            + input1[1] * input2[1] * parameter[1]
+            + parameter[2]
+        ) ** self.power + self.delta(input_abs) * parameter[3]
 
     @partial(jax.jit, static_argnums=(0,))
     def gradient(

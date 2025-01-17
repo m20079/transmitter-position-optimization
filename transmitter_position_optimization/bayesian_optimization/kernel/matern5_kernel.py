@@ -95,6 +95,133 @@ class Matern5TwoDimKernel(Kernel):
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
+class Matern5PolynomialTwoDimKernel(Kernel):
+    def __init__(
+        self,
+        power: int,
+    ) -> None:
+        self.power = power
+
+    def tree_flatten(
+        self: Self,
+    ) -> tuple[tuple[int], None]:
+        return (
+            (self.power,),
+            None,
+        )
+
+    @classmethod
+    def tree_unflatten(cls, aux_data, children) -> "Matern5PolynomialTwoDimKernel":
+        return cls(*children)
+
+    @partial(jax.jit, static_argnums=(0,))
+    def function(
+        self: Self,
+        input1: Array,
+        input2: Array,
+        parameter: Array,
+    ) -> Array:
+        input_abs: Array = jnp.sqrt(
+            jnp.power(input1[0] - input2[0], 2) + jnp.power(input1[1] - input2[1], 2)
+        )
+        return (
+            parameter[0]
+            * (
+                1.0
+                + jnp.sqrt(5.0) * input_abs / parameter[1]
+                + 5.0 / 3.0 * jnp.power(input_abs, 2) / jnp.power(parameter[1], 2)
+            )
+            * jnp.exp(-jnp.sqrt(5.0) * input_abs / parameter[1])
+            + (
+                input1[0] * input2[0] * parameter[2]
+                + input1[1] * input2[1] * parameter[3]
+                + parameter[4]
+            )
+            ** self.power
+            + self.delta(
+                jnp.abs(input1[0] - input2[0]) + jnp.abs(input1[1] - input2[1])
+            )
+            * parameter[5]
+        )
+
+    @partial(jax.jit, static_argnums=(0,))
+    def gradient(
+        self: Self,
+        input1: Array,
+        input2: Array,
+        output_train_data: Array,
+        k_inv: Array,
+        parameter: Array,
+    ) -> Array:
+        return jnp.asarray([])
+
+    @partial(jax.jit, static_argnums=(0,))
+    def hessian_matrix(
+        self: Self,
+        input1: Array,
+        input2: Array,
+        output_train_data: Array,
+        k_inv: Array,
+        parameter: Array,
+    ) -> Array:
+        return jnp.asarray([])
+
+
+class Matern5RationalQuadraticTwoDimKernel(Kernel):
+    @partial(jax.jit, static_argnums=(0,))
+    def function(
+        self: Self,
+        input1: Array,
+        input2: Array,
+        parameter: Array,
+    ) -> Array:
+        input_abs: Array = jnp.sqrt(
+            jnp.power(input1[0] - input2[0], 2) + jnp.power(input1[1] - input2[1], 2)
+        )
+        return (
+            parameter[0]
+            * (
+                1.0
+                + jnp.sqrt(5.0) * input_abs / parameter[1]
+                + 5.0 / 3.0 * jnp.power(input_abs, 2) / jnp.power(parameter[1], 2)
+            )
+            * jnp.exp(-jnp.sqrt(5.0) * input_abs / parameter[1])
+            + (
+                1.0
+                + jnp.power(input_abs, 2)
+                / (2.0 * jnp.power(parameter[2], 2) * parameter[3])
+            )
+            ** -parameter[4]
+            + self.delta(
+                jnp.abs(input1[0] - input2[0]) + jnp.abs(input1[1] - input2[1])
+            )
+            * parameter[5]
+        )
+
+    @partial(jax.jit, static_argnums=(0,))
+    def gradient(
+        self: Self,
+        input1: Array,
+        input2: Array,
+        output_train_data: Array,
+        k_inv: Array,
+        parameter: Array,
+    ) -> Array:
+        return jnp.asarray([])
+
+    @partial(jax.jit, static_argnums=(0,))
+    def hessian_matrix(
+        self: Self,
+        input1: Array,
+        input2: Array,
+        output_train_data: Array,
+        k_inv: Array,
+        parameter: Array,
+    ) -> Array:
+        return jnp.asarray([])
+
+
 class DoubleMatern5TwoDimKernel(Kernel):
     @partial(jax.jit, static_argnums=(0,))
     def function(
@@ -124,7 +251,7 @@ class DoubleMatern5TwoDimKernel(Kernel):
                 + 5.0 / 3.0 * jnp.power(input_abs2, 2) / jnp.power(parameter[3], 2)
             )
             * jnp.exp(-jnp.sqrt(5.0) * input_abs2 / parameter[3])
-            + self.delta(input_abs1 + input_abs2) * parameter[2]
+            + self.delta(input_abs1 + input_abs2) * parameter[4]
         )
 
     @partial(jax.jit, static_argnums=(0,))
@@ -148,6 +275,61 @@ class DoubleMatern5TwoDimKernel(Kernel):
         parameter: Array,
     ) -> Array:
         return jnp.asarray([])
+
+
+class DoubleTimesMatern5TwoDimKernel(Kernel):
+    @partial(jax.jit, static_argnums=(0,))
+    def function(
+        self: Self,
+        input1: Array,
+        input2: Array,
+        parameter: Array,
+    ) -> Array:
+        input_abs1: Array = jnp.sqrt(
+            jnp.power(input1[0] - input2[0], 2) + jnp.power(input1[1] - input2[1], 2)
+        )
+        input_abs2: Array = jnp.sqrt(
+            jnp.power(input1[2] - input2[2], 2) + jnp.power(input1[3] - input2[3], 2)
+        )
+        return (
+            parameter[0]
+            * (
+                1.0
+                + jnp.sqrt(5.0) * input_abs1 / parameter[1]
+                + 5.0 / 3.0 * jnp.power(input_abs1, 2) / jnp.power(parameter[1], 2)
+            )
+            * jnp.exp(-jnp.sqrt(5.0) * input_abs1 / parameter[1])
+            * (
+                1.0
+                + jnp.sqrt(5.0) * input_abs2 / parameter[2]
+                + 5.0 / 3.0 * jnp.power(input_abs2, 2) / jnp.power(parameter[2], 2)
+            )
+            * jnp.exp(-jnp.sqrt(5.0) * input_abs2 / parameter[2])
+            + self.delta(input_abs1 + input_abs2) * parameter[3]
+        )
+
+    @partial(jax.jit, static_argnums=(0,))
+    def gradient(
+        self: Self,
+        input1: Array,
+        input2: Array,
+        output_train_data: Array,
+        k_inv: Array,
+        parameter: Array,
+    ) -> Array:
+        return jnp.asarray([])
+
+    @partial(jax.jit, static_argnums=(0,))
+    def hessian_matrix(
+        self: Self,
+        input1: Array,
+        input2: Array,
+        output_train_data: Array,
+        k_inv: Array,
+        parameter: Array,
+    ) -> Array:
+        return jnp.asarray([])
+
 
 class TripleMatern5TwoDimKernel(Kernel):
     @partial(jax.jit, static_argnums=(0,))
