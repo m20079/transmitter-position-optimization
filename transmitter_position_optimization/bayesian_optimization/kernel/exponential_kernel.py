@@ -282,9 +282,6 @@ class ExponentialRationalQuadraticTwoDimKernel(Kernel):
         input2: Array,
         parameter: Array,
     ) -> Array:
-        input_abs: Array = jnp.sqrt(
-            jnp.power(input1[0] - input2[0], 2) + jnp.power(input1[1] - input2[1], 2)
-        )
         return (
             parameter[0]
             * jnp.exp(
