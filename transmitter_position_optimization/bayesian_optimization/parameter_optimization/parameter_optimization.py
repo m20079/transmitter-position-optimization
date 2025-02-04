@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import ABCMeta, abstractmethod
 from functools import partial
 from typing import Self
 
@@ -8,7 +8,7 @@ from bayesian_optimization.kernel.kernel import Kernel
 from jax import Array
 
 
-class ParameterOptimization:
+class ParameterOptimization(metaclass=ABCMeta):
     @abstractmethod
     @partial(jax.jit, static_argnums=(0, 3))
     def optimize(

@@ -9,6 +9,28 @@ from jax import Array
 
 
 class GaussianKernel(Kernel):
+    @staticmethod
+    @jax.jit
+    def random_search_range() -> Array:
+        return jnp.asarray(
+            [
+                [0.0, 0.0, 0.0],
+                [1.0e4, 1.0e4, 1.0e-1],
+            ],
+            dtype=constant.floating,
+        )
+
+    @staticmethod
+    @jax.jit
+    def log_random_search_range() -> Array:
+        return jnp.asarray(
+            [
+                [1.0e-2, 1.0e-2, 1.0e-7],
+                [1.0e4, 1.0e4, 1.0e-1],
+            ],
+            dtype=constant.floating,
+        )
+
     @partial(jax.jit, static_argnums=(0,))
     def function(
         self: Self,
@@ -230,6 +252,28 @@ class GaussianKernel(Kernel):
 
 
 class GaussianTwoDimKernel(Kernel):
+    @staticmethod
+    @jax.jit
+    def random_search_range() -> Array:
+        return jnp.asarray(
+            [
+                [0.0, 0.0, 0.0],
+                [1.0e4, 1.0e4, 1.0e-1],
+            ],
+            dtype=constant.floating,
+        )
+
+    @staticmethod
+    @jax.jit
+    def log_random_search_range() -> Array:
+        return jnp.asarray(
+            [
+                [1.0e-2, 1.0e-2, 1.0e-7],
+                [1.0e4, 1.0e4, 1.0e-1],
+            ],
+            dtype=constant.floating,
+        )
+
     @partial(jax.jit, static_argnums=(0,))
     def function(
         self: Self,
@@ -336,19 +380,43 @@ class GaussianPolynomialTwoDimKernel(Kernel):
         self,
         power: int,
     ) -> None:
-        self.power = power
+        self.power: int = power
 
     def tree_flatten(
         self: Self,
-    ) -> tuple[tuple[int], None]:
+    ) -> tuple[tuple[()], dict[str, int]]:
         return (
-            (self.power,),
-            None,
+            (),
+            {
+                "power": self.power,
+            },
         )
 
     @classmethod
     def tree_unflatten(cls, aux_data, children) -> "GaussianPolynomialTwoDimKernel":
-        return cls(*children)
+        return cls(*children, **aux_data)
+
+    @staticmethod
+    @jax.jit
+    def random_search_range() -> Array:
+        return jnp.asarray(
+            [
+                [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
+            ],
+            dtype=constant.floating,
+        )
+
+    @staticmethod
+    @jax.jit
+    def log_random_search_range() -> Array:
+        return jnp.asarray(
+            [
+                [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
+                [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
+            ],
+            dtype=constant.floating,
+        )
 
     @partial(jax.jit, static_argnums=(0,))
     def function(
@@ -401,62 +469,29 @@ class GaussianPolynomialTwoDimKernel(Kernel):
         return jnp.asarray([])
 
 
-class GaussianRationalQuadraticTwoDimKernel(Kernel):
-    @partial(jax.jit, static_argnums=(0,))
-    def function(
-        self: Self,
-        input1: Array,
-        input2: Array,
-        parameter: Array,
-    ) -> Array:
-        return (
-            parameter[0]
-            * jnp.exp(
-                -(
-                    jnp.power(input1[0] - input2[0], 2)
-                    + jnp.power(input1[1] - input2[1], 2)
-                )
-                / parameter[1]
-            )
-            + (
-                1.0
-                + (
-                    jnp.power(input1[0] - input2[0], 2)
-                    + jnp.power(input1[1] - input2[1], 2)
-                )
-                / (2.0 * jnp.power(parameter[2], 2) * parameter[3])
-            )
-            ** -parameter[4]
-            + self.delta(
-                jnp.abs(input1[0] - input2[0]) + jnp.abs(input1[1] - input2[1])
-            )
-            * parameter[5]
+class GaussianPlusGaussianFourDimKernel(Kernel):
+    @staticmethod
+    @jax.jit
+    def random_search_range() -> Array:
+        return jnp.asarray(
+            [
+                [0.0, 0.0, 0.0, 0.0, 0.0],
+                [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
+            ],
+            dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
-    def gradient(
-        self: Self,
-        input1: Array,
-        input2: Array,
-        output_train_data: Array,
-        k_inv: Array,
-        parameter: Array,
-    ) -> Array:
-        return jnp.asarray([])
+    @staticmethod
+    @jax.jit
+    def log_random_search_range() -> Array:
+        return jnp.asarray(
+            [
+                [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
+                [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
+            ],
+            dtype=constant.floating,
+        )
 
-    @partial(jax.jit, static_argnums=(0,))
-    def hessian_matrix(
-        self: Self,
-        input1: Array,
-        input2: Array,
-        output_train_data: Array,
-        k_inv: Array,
-        parameter: Array,
-    ) -> Array:
-        return jnp.asarray([])
-
-
-class DoubleGaussianTwoDimKernel(Kernel):
     @partial(jax.jit, static_argnums=(0,))
     def function(
         self: Self,
@@ -513,7 +548,29 @@ class DoubleGaussianTwoDimKernel(Kernel):
         return jnp.asarray([])
 
 
-class DoubleTimesGaussianTwoDimKernel(Kernel):
+class GaussianTimesGaussianFourDimKernel(Kernel):
+    @staticmethod
+    @jax.jit
+    def random_search_range() -> Array:
+        return jnp.asarray(
+            [
+                [0.0, 0.0, 0.0, 0.0],
+                [1.0e4, 1.0e4, 1.0e4, 1.0e-1],
+            ],
+            dtype=constant.floating,
+        )
+
+    @staticmethod
+    @jax.jit
+    def log_random_search_range() -> Array:
+        return jnp.asarray(
+            [
+                [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
+                [1.0e4, 1.0e4, 1.0e4, 1.0e-1],
+            ],
+            dtype=constant.floating,
+        )
+
     @partial(jax.jit, static_argnums=(0,))
     def function(
         self: Self,
@@ -569,7 +626,29 @@ class DoubleTimesGaussianTwoDimKernel(Kernel):
         return jnp.asarray([])
 
 
-class TripleGaussianTwoDimKernel(Kernel):
+class GaussianPlusGaussianPlusGaussianSixDimKernel(Kernel):
+    @staticmethod
+    @jax.jit
+    def random_search_range() -> Array:
+        return jnp.asarray(
+            [
+                [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
+            ],
+            dtype=constant.floating,
+        )
+
+    @staticmethod
+    @jax.jit
+    def log_random_search_range() -> Array:
+        return jnp.asarray(
+            [
+                [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
+                [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
+            ],
+            dtype=constant.floating,
+        )
+
     @partial(jax.jit, static_argnums=(0,))
     def function(
         self: Self,
@@ -611,6 +690,93 @@ class TripleGaussianTwoDimKernel(Kernel):
                 + jnp.abs(input1[5] - input2[5])
             )
             * parameter[6]
+        )
+
+    @partial(jax.jit, static_argnums=(0,))
+    def gradient(
+        self: Self,
+        input1: Array,
+        input2: Array,
+        output_train_data: Array,
+        k_inv: Array,
+        parameter: Array,
+    ) -> Array:
+        return jnp.asarray([])
+
+    @partial(jax.jit, static_argnums=(0,))
+    def hessian_matrix(
+        self: Self,
+        input1: Array,
+        input2: Array,
+        output_train_data: Array,
+        k_inv: Array,
+        parameter: Array,
+    ) -> Array:
+        return jnp.asarray([])
+
+
+class GaussianTimesGaussianTimesGaussianSixDimKernel(Kernel):
+    @staticmethod
+    @jax.jit
+    def random_search_range() -> Array:
+        return jnp.asarray(
+            [
+                [0.0, 0.0, 0.0, 0.0, 0.0],
+                [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
+            ],
+            dtype=constant.floating,
+        )
+
+    @staticmethod
+    @jax.jit
+    def log_random_search_range() -> Array:
+        return jnp.asarray(
+            [
+                [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
+                [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
+            ],
+            dtype=constant.floating,
+        )
+
+    @partial(jax.jit, static_argnums=(0,))
+    def function(
+        self: Self,
+        input1: Array,
+        input2: Array,
+        parameter: Array,
+    ) -> Array:
+        return (
+            parameter[0]
+            * jnp.exp(
+                -(
+                    jnp.power(input1[0] - input2[0], 2)
+                    + jnp.power(input1[1] - input2[1], 2)
+                )
+                / parameter[1]
+            )
+            * jnp.exp(
+                -(
+                    jnp.power(input1[2] - input2[2], 2)
+                    + jnp.power(input1[3] - input2[3], 2)
+                )
+                / parameter[2]
+            )
+            * jnp.exp(
+                -(
+                    jnp.power(input1[4] - input2[4], 2)
+                    + jnp.power(input1[5] - input2[5], 2)
+                )
+                / parameter[3]
+            )
+            + self.delta(
+                jnp.abs(input1[0] - input2[0])
+                + jnp.abs(input1[1] - input2[1])
+                + jnp.abs(input1[2] - input2[2])
+                + jnp.abs(input1[3] - input2[3])
+                + jnp.abs(input1[4] - input2[4])
+                + jnp.abs(input1[5] - input2[5])
+            )
+            * parameter[4]
         )
 
     @partial(jax.jit, static_argnums=(0,))

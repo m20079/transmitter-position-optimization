@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import ABCMeta, abstractmethod
 from functools import partial
 from typing import Self
 
@@ -7,7 +7,19 @@ import jax.numpy as jnp
 from jax import Array
 
 
-class Kernel:
+class Kernel(metaclass=ABCMeta):
+    @staticmethod
+    @abstractmethod
+    @jax.jit
+    def random_search_range() -> Array:
+        pass
+
+    @staticmethod
+    @abstractmethod
+    @jax.jit
+    def log_random_search_range() -> Array:
+        pass
+
     @abstractmethod
     @partial(jax.jit, static_argnums=(0,))
     def function(

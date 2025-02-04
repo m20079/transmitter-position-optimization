@@ -41,7 +41,7 @@ class Transmitter:
 
     @classmethod
     def tree_unflatten(cls, aux_data, children) -> "Transmitter":
-        return cls(*children)
+        return cls(*children, **aux_data)
 
     @partial(jax.jit, static_argnums=(0,))
     def get_transmitter_distance(

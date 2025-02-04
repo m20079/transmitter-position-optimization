@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Self
+from typing import Any, Self
 
 import constant
 import jax
@@ -17,30 +17,27 @@ class MCMC(ParameterOptimization):
         self,
         count: int,
         seed: int,
-        sigma_params: Array,
+        std_params: Array,
         parameter_optimization: ParameterOptimization,
     ) -> None:
         self.count: int = count
         self.seed: int = seed
-        self.sigma_params: Array = sigma_params
+        self.std_params: Array = std_params
         self.parameter_optimization: ParameterOptimization = parameter_optimization
 
-    def tree_flatten(
-        self: Self,
-    ) -> tuple[tuple[int, int, Array, ParameterOptimization], None]:
+    def tree_flatten(self: Self) -> tuple[tuple[Array], dict[str, Any]]:
         return (
-            (
-                self.count,
-                self.seed,
-                self.sigma_params,
-                self.parameter_optimization,
-            ),
-            None,
+            (self.std_params,),
+            {
+                "count": self.count,
+                "seed": self.seed,
+                "parameter_optimization": self.parameter_optimization,
+            },
         )
 
     @classmethod
-    def tree_unflatten(cls, aux_data, children) -> "ParameterOptimization":
-        return cls(*children)
+    def tree_unflatten(cls, aux_data, children) -> "MCMC":
+        return cls(*children, **aux_data)
 
     @partial(jax.jit, static_argnums=(0, 3))
     def optimize(
@@ -53,31 +50,42 @@ class MCMC(ParameterOptimization):
         max: Array = jnp.finfo(constant.floating).max.astype(constant.floating)
 
         init_parameter: Array = self.parameter_optimization.optimize(
-            input_train_data, output_train_data, kernel
+            input_train_data=input_train_data,
+            output_train_data=output_train_data,
+            kernel=kernel,
         )
-        keys: Array = random.split(random.key(self.seed), self.sigma_params.size)
+
+        keys: Array = random.split(random.key(self.seed), self.std_params.size)
         parameter: Array = jax.vmap(
-            lambda key, sigma_param: random.normal(
+            lambda key, std_param: std_param
+            * random.normal(
                 key,
                 (self.count,),
             )
-            * sigma_param
-        )(keys, self.sigma_params)
+        )(keys, self.std_params)
 
         @jax.jit
         def body_fun(
             val: tuple[Array, Array, Array, Array, Array],
             parameter_i: Array,
         ) -> tuple[tuple[Array, Array, Array, Array, Array], None]:
-            index, old_parameter, old_likelihood, max_parameter, max_likelihood = val
+            seed, old_parameter, old_likelihood, max_parameter, max_likelihood = val
             new_parameter: Array = jnp.clip(old_parameter + parameter_i, min, max)
-            k: Array = kernel.create_k(input_train_data, new_parameter)
+            k: Array = kernel.create_k(
+                input_train_data=input_train_data,
+                parameter=new_parameter,
+            )
             k_inv: Array = jnp.linalg.inv(k)
-            likelihood: Array = self.get_log_likelihood(k, k_inv, output_train_data)
-            accept_prob: Array = random.uniform(random.key(seed=index))
+            likelihood: Array = self.get_log_likelihood(
+                k=k,
+                k_inv=k_inv,
+                output_train_data=output_train_data,
+            )
+            key: Array = random.key(seed)
+            accept_prob: Array = random.uniform(key)
             return (
                 (
-                    index + 1,
+                    seed + 1,
                     jnp.where(
                         likelihood > old_likelihood,
                         new_parameter,

@@ -5,25 +5,17 @@ import jax
 import jax.numpy as jnp
 from bayesian_optimization.acquisition import Acquisition
 from bayesian_optimization.kernel.exponential_kernel import (
-    DoubleExponentialTwoDimKernel,
     ExponentialTwoDimKernel,
-    TripleExponentialTwoDimKernel,
 )
 from bayesian_optimization.kernel.gaussian_kernel import (
-    DoubleGaussianTwoDimKernel,
     GaussianTwoDimKernel,
-    TripleGaussianTwoDimKernel,
 )
 from bayesian_optimization.kernel.kernel import Kernel
 from bayesian_optimization.kernel.matern3_kernel import (
-    DoubleMatern3TwoDimKernel,
     Matern3TwoDimKernel,
-    TripleMatern3TwoDimKernel,
 )
 from bayesian_optimization.kernel.matern5_kernel import (
-    DoubleMatern5TwoDimKernel,
     Matern5TwoDimKernel,
-    TripleMatern5TwoDimKernel,
 )
 from bayesian_optimization.parameter_optimization.mcmc import (
     MCMC,
@@ -31,6 +23,7 @@ from bayesian_optimization.parameter_optimization.mcmc import (
 from bayesian_optimization.parameter_optimization.random_search import (
     RandomSearch,
 )
+from constant import floating, integer
 from environment.coordinate import Coordinate
 from environment.evaluation import Evaluation
 from environment.propagation import Propagation
@@ -42,6 +35,7 @@ from graph import (
 )
 from jax._src.pjit import JitWrapped
 from log import log_all_result
+from numpy import arange
 from simulation import (
     double_transmitter_random_simulation,
     double_transmitter_simulation,
@@ -156,8 +150,8 @@ def single_simulation(
     coordinate = Coordinate(
         x_size=20.0,
         y_size=20.0,
-        y_mesh=40,
-        x_mesh=40,
+        y_mesh=10,
+        x_mesh=10,
     )
     propagation = Propagation(
         seed=0,
@@ -173,22 +167,20 @@ def single_simulation(
     ) = single_transmitter_simulation(
         coordinate=coordinate,
         propagation=propagation,
-        simulation_count=1000,
+        simulation_count=10,
         receiver_number=5,
         noise_floor=-90.0,
         bandwidth=20.0e6,
         frequency=2.4e9,
         kernel=kernel,
         parameter_optimization=MCMC(
-            count=1000,
+            count=10,
             seed=0,
-            sigma_params=jnp.asarray([1.0, 1.0, 0.00001], dtype=constant.floating),
+            std_params=jnp.asarray([1.0, 1.0, 0.00001], dtype=constant.floating),
             parameter_optimization=MCMC(
                 count=1000,
                 seed=0,
-                sigma_params=jnp.asarray(
-                    [100.0, 100.0, 0.001], dtype=constant.floating
-                ),
+                std_params=jnp.asarray([100.0, 100.0, 0.001], dtype=constant.floating),
                 parameter_optimization=RandomSearch(
                     count=100000,
                     seed=0,
@@ -392,13 +384,13 @@ def double_simulation(
         parameter_optimization=MCMC(
             count=1000,
             seed=0,
-            sigma_params=jnp.asarray(
+            std_params=jnp.asarray(
                 [1.0, 1.0, 1.0, 1.0, 0.00001], dtype=constant.floating
             ),
             parameter_optimization=MCMC(
                 count=1000,
                 seed=0,
-                sigma_params=jnp.asarray(
+                std_params=jnp.asarray(
                     [100.0, 100.0, 100.0, 100.0, 0.001],
                     dtype=constant.floating,
                 ),
@@ -648,13 +640,13 @@ def triple_simulation(
         parameter_optimization=MCMC(
             count=1000,
             seed=0,
-            sigma_params=jnp.asarray(
+            std_params=jnp.asarray(
                 [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.00001], dtype=constant.floating
             ),
             parameter_optimization=MCMC(
                 count=1000,
                 seed=0,
-                sigma_params=jnp.asarray(
+                std_params=jnp.asarray(
                     [100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 0.001],
                     dtype=constant.floating,
                 ),
@@ -760,11 +752,49 @@ def triple_simulation(
 
 if __name__ == "__main__":
     jax.config.update("jax_numpy_dtype_promotion", "strict")
-    # jax.config.update("jax_enable_x64", True)
     jax.config.update("jax_platforms", "cpu")
+    jax.config.update(
+        "jax_enable_x64",
+        integer == jnp.int64 and floating == jnp.float64,
+    )
 
+    a = jnp.array([1, 2, 3])
+    b = jnp.array(2.0)
+
+    print(a*b)
+
+    # plot_scatter_density(
+    #     file=f"{debug_name}_scatter.pdf",
+    #     x_value=each_distance_error_a,
+    #     y_value=each_distance_error_b,
+    #     color_label="Density",
+    # )
+    # plot_scatter__density(
+    #     file=f"{debug_name}_scatter.pdf",
+    #     x_value=each_distance_error_a,
+    #     y_value=each_distance_error_b,
+    #     color_label="Density",
+    # )
+    # plot_box(
+    #     file=f"{debug_name}_box.pdf",
+    #     data=[
+    #         count,
+    #         distance_error,
+    #         data_rate_error,
+    #         each_distance_error_a,
+    #         each_distance_error_b,
+    #     ],
+    #     x_tick_labels=[
+    #         "Count",
+    #         "Distance Error",
+    #         "Data Rate Error",
+    #         "Distance Error A",
+    #         "Distance Error B",
+    #     ],
+    #     y_label="Value",
+    # )
     # double_simulation(
-    #     kernel=DoubleGaussianTwoDimKernel(),
+    #     kernel=GaussianTwoDimKernel(),
     #     kernel_name="gaussian",
     #     evaluation=Evaluation.min,
     #     evaluation_name="min",

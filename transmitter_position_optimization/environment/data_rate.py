@@ -43,9 +43,7 @@ class DataRate:
 
         return function
 
-    def create_double_transmitter_function(
-        self: Self,
-    ) -> JitWrapped:
+    def create_double_transmitter_function(self: Self) -> JitWrapped:
         @jax.jit
         def function(
             x_indices_a: Array,
@@ -59,9 +57,7 @@ class DataRate:
 
         return function
 
-    def create_triple_transmitter_function(
-        self: Self,
-    ) -> JitWrapped:
+    def create_triple_transmitter_function(self: Self) -> JitWrapped:
         @jax.jit
         def function(
             x_indices_a: Array,

@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Self
+from typing import Any, Self
 
 import jax
 import jax.numpy as jnp
@@ -15,39 +15,33 @@ from jax import Array, random
 class Propagation:
     def __init__(
         self,
-        free_distance: float | Array,
-        propagation_coefficient: float | Array,
-        distance_correlation: float | Array,
-        standard_deviation: float | Array,
-        seed: int | Array,
+        free_distance: float,
+        propagation_coefficient: float,
+        distance_correlation: float,
+        standard_deviation: float,
+        seed: int,
     ) -> None:
-        self.free_distance: Array = jnp.asarray(free_distance, dtype=floating)
-        self.propagation_coefficient: Array = jnp.asarray(
-            propagation_coefficient, dtype=floating
-        )
-        self.distance_correlation: Array = jnp.asarray(
-            distance_correlation, dtype=floating
-        )
-        self.standard_deviation: Array = jnp.asarray(standard_deviation, dtype=floating)
-        self.seed: Array = jnp.asarray(seed, dtype=integer)
+        self.free_distance: float = free_distance
+        self.propagation_coefficient: float = propagation_coefficient
+        self.distance_correlation: float = distance_correlation
+        self.standard_deviation: float = standard_deviation
+        self.seed: int = seed
 
-    def tree_flatten(
-        self: Self,
-    ) -> tuple[tuple[Array, Array, Array, Array, Array], None]:
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict["str", Any]]:
         return (
-            (
-                self.free_distance,
-                self.propagation_coefficient,
-                self.distance_correlation,
-                self.standard_deviation,
-                self.seed,
-            ),
-            None,
+            (),
+            {
+                "free_distance": self.free_distance,
+                "propagation_coefficient": self.propagation_coefficient,
+                "distance_correlation": self.distance_correlation,
+                "standard_deviation": self.standard_deviation,
+                "seed": self.seed,
+            },
         )
 
     @classmethod
     def tree_unflatten(cls, aux_data, children) -> "Propagation":
-        return cls(*children)
+        return cls(*children, **aux_data)
 
     @partial(jax.jit, static_argnums=(0, 1))
     def update_seed(self: Self, seed: int) -> "Propagation":
@@ -95,7 +89,7 @@ class Propagation:
         covariance_matrix: Array = correlation_matrix * self.standard_deviation**2.0
         l_covariance_matrix: Array = jnp.linalg.cholesky(covariance_matrix)
         normal_random = random.normal(
-            key=key, shape=(int(coordinate.x_mesh) * int(coordinate.y_mesh),)
+            key=key, shape=(coordinate.x_mesh * coordinate.y_mesh,)
         )
         return (l_covariance_matrix @ normal_random).reshape(
             (coordinate.y_mesh, coordinate.x_mesh)
@@ -152,8 +146,8 @@ class Propagation:
     ) -> DataRate:
         data_rate: Array = jnp.zeros(
             (
-                int(coordinate.y_mesh) + 1,
-                int(coordinate.x_mesh) + 1,
+                coordinate.y_mesh + 1,
+                coordinate.x_mesh + 1,
                 receivers.bandwidth.size,
             ),
             dtype=floating,
@@ -174,7 +168,7 @@ class Propagation:
                             init_x_position=init_x_position,
                             init_y_position=init_y_position,
                         )
-                    )(jnp.arange(start=0, stop=int(coordinate.x_mesh) + 1, step=1))
+                    )(jnp.arange(start=0, stop=coordinate.x_mesh + 1, step=1))
                 ),
                 init_val=data_rate,
             )
@@ -191,8 +185,8 @@ class Propagation:
                         init_x_position=init_x_position,
                         init_y_position=init_y_position,
                     )
-                )(jnp.arange(start=0, stop=int(coordinate.x_mesh) + 1, step=1))
-            )(jnp.arange(start=0, stop=int(coordinate.y_mesh) + 1, step=1))
+                )(jnp.arange(start=0, stop=coordinate.x_mesh + 1, step=1))
+            )(jnp.arange(start=0, stop=coordinate.y_mesh + 1, step=1))
 
         def fori_loop_fori_loop() -> Array:
             return jax.lax.fori_loop(

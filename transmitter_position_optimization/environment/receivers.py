@@ -10,17 +10,17 @@ from jax import Array
 class Receivers:
     def __init__(
         self,
-        x_positions: list[float] | Array,
-        y_positions: list[float] | Array,
-        noise_floor: list[float] | Array,
-        bandwidth: list[float] | Array,
+        x_positions: Array,
+        y_positions: Array,
+        noise_floor: Array,
+        bandwidth: Array,
     ) -> None:
-        self.x_positions: Array = jnp.asarray(x_positions, dtype=constant.floating)
-        self.y_positions: Array = jnp.asarray(y_positions, dtype=constant.floating)
-        self.noise_floor: Array = jnp.asarray(noise_floor, dtype=constant.floating)
-        self.bandwidth: Array = jnp.asarray(bandwidth, dtype=constant.floating)
+        self.x_positions: Array = x_positions
+        self.y_positions: Array = y_positions
+        self.noise_floor: Array = noise_floor
+        self.bandwidth: Array = bandwidth
 
-    def tree_flatten(self: Self) -> tuple[tuple[Array, Array, Array, Array], None]:
+    def tree_flatten(self: Self) -> tuple[tuple[Array, Array, Array, Array], dict]:
         return (
             (
                 self.x_positions,
@@ -28,9 +28,9 @@ class Receivers:
                 self.noise_floor,
                 self.bandwidth,
             ),
-            None,
+            {},
         )
 
     @classmethod
     def tree_unflatten(cls, aux_data, children) -> "Receivers":
-        return cls(*children)
+        return cls(*children, **aux_data)

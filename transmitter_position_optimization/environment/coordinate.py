@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Self
+from typing import Any, Self
 
 import constant
 import jax
@@ -13,23 +13,31 @@ from jax import Array, random
 @jax.tree_util.register_pytree_node_class
 class Coordinate:
     def __init__(
-        self: "Coordinate",
+        self: Self,
         x_size: float,
         y_size: float,
         x_mesh: int,
         y_mesh: int,
     ) -> None:
-        self.x_size: Array = jnp.asarray(x_size, dtype=floating)
-        self.y_size: Array = jnp.asarray(y_size, dtype=floating)
-        self.x_mesh: Array = jnp.asarray(x_mesh, dtype=integer)
-        self.y_mesh: Array = jnp.asarray(y_mesh, dtype=integer)
+        self.x_size: float = x_size
+        self.y_size: float = y_size
+        self.x_mesh: int = x_mesh
+        self.y_mesh: int = y_mesh
 
-    def tree_flatten(self) -> tuple[tuple[Array, Array, Array, Array], None]:
-        return ((self.x_size, self.y_size, self.x_mesh, self.y_mesh), None)
+    def tree_flatten(self) -> tuple[tuple[()], dict[str, Any]]:
+        return (
+            (),
+            {
+                "x_size": self.x_size,
+                "y_size": self.y_size,
+                "x_mesh": self.x_mesh,
+                "y_mesh": self.y_mesh,
+            },
+        )
 
     @classmethod
     def tree_unflatten(cls, aux_data, children) -> "Coordinate":
-        return cls(*children)
+        return cls(*children, **aux_data)
 
     @partial(jax.jit, static_argnums=(0,))
     def convert_indices_to_receiver_positions(
@@ -39,10 +47,10 @@ class Coordinate:
     ) -> Array:
         return jnp.asarray(
             [
-                x_indices.astype(floating) * self.x_size / self.x_mesh.astype(floating)
-                + (self.x_size / self.x_mesh.astype(floating) / 2.0),
-                y_indices.astype(floating) * self.y_size / self.y_mesh.astype(floating)
-                + (self.y_size / self.y_mesh.astype(floating) / 2.0),
+                x_indices.astype(floating) * self.x_size / float(self.x_mesh)
+                + (self.x_size / float(self.x_mesh) / 2.0),
+                y_indices.astype(floating) * self.y_size / float(self.y_mesh)
+                + (self.y_size / float(self.y_mesh) / 2.0),
             ],
             dtype=constant.floating,
         )
@@ -55,8 +63,8 @@ class Coordinate:
     ) -> Array:
         return jnp.asarray(
             [
-                x_indices.astype(floating) * self.x_size / self.x_mesh.astype(floating),
-                y_indices.astype(floating) * self.y_size / self.y_mesh.astype(floating),
+                x_indices.astype(floating) * self.x_size / float(self.x_mesh),
+                y_indices.astype(floating) * self.y_size / float(self.y_mesh),
             ],
             dtype=constant.floating,
         )
@@ -69,8 +77,8 @@ class Coordinate:
     ) -> Array:
         return jnp.asarray(
             [
-                x_positions * self.x_mesh.astype(floating) / self.x_size,
-                y_positions * self.y_mesh.astype(floating) / self.y_size,
+                x_positions * float(self.x_mesh) / self.x_size,
+                y_positions * float(self.y_mesh) / self.y_size,
             ]
         ).astype(constant.integer)
 
@@ -82,8 +90,8 @@ class Coordinate:
     ) -> Array:
         return jnp.asarray(
             [
-                x_positions * self.x_mesh.astype(floating) / self.x_size - 0.5,
-                y_positions * self.y_mesh.astype(floating) / self.y_size - 0.5,
+                x_positions * float(self.x_mesh) / self.x_size - 0.5,
+                y_positions * float(self.y_mesh) / self.y_size - 0.5,
             ]
         ).astype(constant.integer)
 
@@ -208,8 +216,8 @@ class Coordinate:
         self: Self,
         number: int,
     ) -> Array:
-        x_grid_size: Array = self.x_mesh // (number * 2)
-        y_grid_size: Array = self.y_mesh // (number * 2)
+        x_grid_size: int = self.x_mesh // (number * 2)
+        y_grid_size: int = self.y_mesh // (number * 2)
         x_grid: Array = jnp.arange(1, number * 2, 2) * x_grid_size
         y_grid: Array = jnp.arange(1, number * 2, 2) * y_grid_size
         return jnp.asarray(
@@ -241,11 +249,14 @@ class Coordinate:
     def get_transmitter_extent(
         self: Self,
     ) -> tuple[float, float, float, float]:
-        x_half_size: Array = self.x_size / self.x_mesh.astype(floating) * 0.5
-        y_half_size: Array = self.y_size / self.y_mesh.astype(floating) * 0.5
+        x_half_size: float = self.x_size / float(self.x_mesh) * 0.5
+        y_half_size: float = self.y_size / float(self.y_mesh) * 0.5
         return (
-            -float(x_half_size),
-            float(self.x_size + x_half_size),
-            float(self.y_size + y_half_size),
-            -float(y_half_size),
+            -x_half_size,
+            self.x_size + x_half_size,
+            self.y_size + y_half_size,
+            -y_half_size,
         )
+
+    def get_search_number(self: Self) -> int:
+        return (self.x_mesh + 1) * (self.y_mesh + 1)

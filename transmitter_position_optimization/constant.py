@@ -2,8 +2,9 @@ from typing import Final
 
 import jax.numpy as jnp
 
-integer: Final = jnp.int32
-floating: Final = jnp.float32
+integer: Final = jnp.int64
+floating: Final = jnp.float64
+
 
 # 0: fori_loop →　vmap
 # 1: vmap → vmap
@@ -14,3 +15,7 @@ double_transmitter_search_size = 100
 double_transmitter_max_size = 100
 triple_transmitter_search_size = 10
 triple_transmitter_max_size = 10
+
+
+mean_max_delta = 1.0e-5
+std_delta = 1.0e-5

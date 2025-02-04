@@ -11,7 +11,7 @@ from jax import Array, random
 
 
 @jax.tree_util.register_pytree_node_class
-class RandomSearch(ParameterOptimization):
+class LogRandomSearch(ParameterOptimization):
     def __init__(
         self,
         count: int,
@@ -39,7 +39,7 @@ class RandomSearch(ParameterOptimization):
         )
 
     @classmethod
-    def tree_unflatten(cls, aux_data, children) -> "RandomSearch":
+    def tree_unflatten(cls, aux_data, children) -> "LogRandomSearch":
         return cls(*children, **aux_data)
 
     @partial(jax.jit, static_argnums=(0, 3))
@@ -49,16 +49,18 @@ class RandomSearch(ParameterOptimization):
         output_train_data: Array,
         kernel: Kernel,
     ) -> Array:
-        keys: Array = random.split(random.key(self.seed), self.lower_bound.size)
+        key: Array = random.key(self.seed)
 
-        parameter: Array = jax.vmap(
-            lambda key, min_param, max_param: random.uniform(
-                key,
-                (self.count,),
-                minval=min_param,
-                maxval=max_param,
-            )
-        )(keys, self.lower_bound, self.upper_bound)
+        random_uniform: Array = random.uniform(
+            key,
+            (self.lower_bound.size, self.count),
+        )
+
+        parameter: Array = (
+            jnp.expand_dims(self.lower_bound, axis=1)
+            * (jnp.expand_dims(self.upper_bound / self.lower_bound, axis=1))
+            ** random_uniform
+        )
 
         @jax.jit
         def body_fn(
