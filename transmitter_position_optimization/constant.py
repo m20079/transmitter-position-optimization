@@ -11,11 +11,14 @@ floating: Final = jnp.float64
 # 2: fori_loop → fori_loop
 data_rate_generation: Final[int] = 0
 
-double_transmitter_search_size = 100
-double_transmitter_max_size = 100
-triple_transmitter_search_size = 10
-triple_transmitter_max_size = 10
+double_transmitter_search_size: Final[int] = 100
+double_transmitter_max_size: Final[int] = 100
+triple_transmitter_search_size: Final[int] = 10
+triple_transmitter_max_size: Final[int] = 10
 
+# EI PI param
+mean_max_delta: Final[float] = 1.0e-5
+std_delta: Final[float] = 1.0e-5
 
-mean_max_delta = 1.0e-5
-std_delta = 1.0e-5
+# max log likelihood
+max_log_likelihood: Final[float] = 0.0

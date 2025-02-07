@@ -1,5 +1,4 @@
 from abc import ABCMeta, abstractmethod
-from functools import partial
 from typing import Self
 
 import jax
@@ -7,7 +6,18 @@ import jax.numpy as jnp
 from jax import Array
 
 
+@jax.tree_util.register_pytree_node_class
 class Kernel(metaclass=ABCMeta):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(cls, aux_data, children) -> "Kernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @abstractmethod
     @jax.jit
@@ -21,7 +31,7 @@ class Kernel(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -31,7 +41,7 @@ class Kernel(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -43,7 +53,7 @@ class Kernel(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -54,11 +64,11 @@ class Kernel(metaclass=ABCMeta):
     ) -> Array:
         pass
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def delta(self: Self, x: Array) -> Array:
         return jnp.where(x == 0.0, 1.0, 0.0)
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def create_k(
         self: Self,
         input_train_data: Array,
@@ -70,7 +80,7 @@ class Kernel(metaclass=ABCMeta):
             parameter,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def create_k_star(
         self: Self,
         input_train_data: Array,
@@ -83,7 +93,7 @@ class Kernel(metaclass=ABCMeta):
             parameter,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def create_k_star_star(
         self: Self,
         input_test_data: Array,
@@ -95,7 +105,7 @@ class Kernel(metaclass=ABCMeta):
             parameter,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def create_gradient(
         self: Self,
         input_train_data: Array,
@@ -111,7 +121,7 @@ class Kernel(metaclass=ABCMeta):
             parameter=parameter,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def create_hessian_matrix(
         self: Self,
         input_train_data: Array,
@@ -127,7 +137,7 @@ class Kernel(metaclass=ABCMeta):
             parameter=parameter,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def get_del_log_likelihood(
         self: Self,
         k_inv: Array,
@@ -140,7 +150,7 @@ class Kernel(metaclass=ABCMeta):
             @ (k_inv @ output_train_data)
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def get_del_squared_log_likelihood(
         self: Self,
         k_inv: Array,

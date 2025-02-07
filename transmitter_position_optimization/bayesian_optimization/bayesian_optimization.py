@@ -17,28 +17,30 @@ from jax import Array
 from jax._src.pjit import JitWrapped
 
 
-def single_transmitter_bayesian(
+def single_transmitter_bayesian_optimization(
     propagation: Propagation,
     coordinate: Coordinate,
-    receivers: Receivers,
-    frequency: float,
-    init_x_position: float,
-    init_y_position: float,
     x_train_indices: Array,
     y_train_indices: Array,
     kernel: Kernel,
+    receiver_number: int,
+    noise_floor: float,
+    bandwidth: float,
     parameter_optimization: ParameterOptimization,
     evaluation_function: JitWrapped,
     acquisition_function: JitWrapped,
+    receivers_key: Array,
+    shadowing_key: Array,
 ) -> tuple[int, float, float]:
     max_search_number: int = coordinate.get_search_number()
 
     data_rate: DataRate = propagation.create_data_rate(
         coordinate=coordinate,
-        receivers=receivers,
-        frequency=frequency,
-        init_x_position=init_x_position,
-        init_y_position=init_y_position,
+        receivers_key=receivers_key,
+        shadowing_key=shadowing_key,
+        receiver_number=receiver_number,
+        noise_floor=noise_floor,
+        bandwidth=bandwidth,
     )
     transmitter_function: JitWrapped = data_rate.create_single_transmitter_function()
 
@@ -58,16 +60,17 @@ def single_transmitter_bayesian(
     data_rate_error = jnp.asarray(0, dtype=constant.integer)
 
     for count in range(x_train_indices.size, max_search_number):
-        input_train_data: Array = coordinate.convert_indices_to_transmitter_positions(
-            x_indices=x_train_indices,
-            y_indices=y_train_indices,
+        input_train_data: Array = jnp.asarray(
+            coordinate.convert_indices_to_transmitter_positions(
+                x_indices=x_train_indices,
+                y_indices=y_train_indices,
+            )
         )
         output_train_data: Array = evaluation_function(
             data_rate=transmitter_function(
                 x_indices=x_train_indices,
                 y_indices=y_train_indices,
             ),
-            axis=1,
         )
 
         optimized_parameters: Array = parameter_optimization.optimize(
@@ -85,6 +88,7 @@ def single_transmitter_bayesian(
             input_test_data=input_test_data,
             output_shape=x_transmitter_positions.shape,
         )
+
         acquisition: Array = acquisition_function(
             mean=mean,
             std=std,
@@ -127,8 +131,10 @@ def single_transmitter_bayesian(
                     y_indices=y_train_indices[final_train_data_index[0]],
                 )
             )
-            max_x_indices, max_y_indices = data_rate.get_single_max_transmitter_indices(
-                evaluation_function=evaluation_function
+            max_x_indices, max_y_indices = (
+                data_rate.get_true_single_transmitter_indices(
+                    evaluation_function=evaluation_function
+                )
             )
             max_x_positions, max_y_positions = (
                 coordinate.convert_indices_to_transmitter_positions(
@@ -148,7 +154,7 @@ def single_transmitter_bayesian(
                 max_x_indices, max_y_indices
             )
             max_data_rate: Array = evaluation_function(
-                data_rate=each_max_data_rate, axis=0
+                data_rate=each_max_data_rate,
             )
             data_rate_error: Array = max_data_rate - output_train_data.max()
 
@@ -161,7 +167,7 @@ def single_transmitter_bayesian(
     )
 
 
-def double_transmitter_bayesian(
+def double_transmitter_bayesian_optimization(
     propagation: Propagation,
     coordinate: Coordinate,
     receivers: Receivers,
@@ -217,7 +223,6 @@ def double_transmitter_bayesian(
         )
         output_train_data: Array = evaluation_function(
             data_rate=each_data_rate,
-            axis=1,
         )
 
         optimized_parameters: Array = parameter_optimization.optimize(
@@ -318,7 +323,7 @@ def double_transmitter_bayesian(
                     y_indices=y_train_indices_b[final_train_data_index[0]],
                 )
             )
-            max_indices: Array = data_rate.get_double_max_transmitter_indices(
+            max_indices: Array = data_rate.get_true_double_transmitter_indices(
                 evaluation_function=evaluation_function
             )
             pure_max_indices: Array = max_indices[jnp.all(max_indices != -1, axis=1)]
@@ -362,7 +367,7 @@ def double_transmitter_bayesian(
                 y_indices_b=pure_max_indices.T.at[3].get(),
             )
             max_data_rate: Array = evaluation_function(
-                data_rate=each_max_data_rate.at[0].get(), axis=0
+                data_rate=each_max_data_rate.at[0].get()
             )
             data_rate_error: Array = max_data_rate - output_train_data.max()
 
@@ -379,7 +384,7 @@ def double_transmitter_bayesian(
     )
 
 
-def triple_transmitter_bayesian(
+def triple_transmitter_bayesian_optimization(
     propagation: Propagation,
     coordinate: Coordinate,
     receivers: Receivers,
@@ -622,7 +627,7 @@ def triple_transmitter_bayesian(
                     y_indices=y_train_indices_c[final_train_data_index[0]],
                 )
             )
-            max_indices = data_rate.get_triple_max_transmitter_indices(
+            max_indices = data_rate.get_true_triple_transmitter_indices(
                 evaluation_function=evaluation_function
             )
             pure_max_indices: Array = max_indices[jnp.all(max_indices != -1, axis=1)]
@@ -684,7 +689,7 @@ def triple_transmitter_bayesian(
                 y_indices_c=pure_max_indices.T.at[5].get(),
             )
             max_data_rate: Array = evaluation_function(
-                data_rate=each_max_data_rate.at[0].get(), axis=0
+                data_rate=each_max_data_rate.at[0].get()
             )
             data_rate_error: Array = max_data_rate - output_train_data.max()
 

@@ -1,4 +1,3 @@
-from functools import partial
 from typing import Self
 
 import constant
@@ -8,7 +7,18 @@ from bayesian_optimization.kernel.kernel import Kernel
 from jax import Array
 
 
+@jax.tree_util.register_pytree_node_class
 class ExponentialKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(cls, aux_data, children) -> "ExponentialKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -31,7 +41,7 @@ class ExponentialKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -43,7 +53,7 @@ class ExponentialKernel(Kernel):
             + self.delta(input1[0] - input2[0]) * parameter[2]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -73,7 +83,7 @@ class ExponentialKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def del_k_del_parameter0(
         self: Self,
         input1: Array,
@@ -82,7 +92,7 @@ class ExponentialKernel(Kernel):
     ) -> Array:
         return parameter[0] * jnp.exp(-jnp.abs(input1[0] - input2[0]) / parameter[1])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def del_k_del_parameter1(
         self: Self,
         input1: Array,
@@ -93,7 +103,7 @@ class ExponentialKernel(Kernel):
             jnp.abs(input1[0] - input2[0]) / parameter[1]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def del_k_del_parameter2(
         self: Self,
         input1: Array,
@@ -102,7 +112,7 @@ class ExponentialKernel(Kernel):
     ) -> Array:
         return self.delta(input1[0] - input2[0]) * parameter[2]
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -114,7 +124,18 @@ class ExponentialKernel(Kernel):
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
 class ExponentialTwoDimKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(cls, aux_data, children) -> "ExponentialTwoDimKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -137,7 +158,7 @@ class ExponentialTwoDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -159,7 +180,7 @@ class ExponentialTwoDimKernel(Kernel):
             * parameter[2]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -189,7 +210,7 @@ class ExponentialTwoDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def del_k_del_parameter0(
         self: Self,
         input1: Array,
@@ -206,7 +227,7 @@ class ExponentialTwoDimKernel(Kernel):
             / parameter[1]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def del_k_del_parameter1(
         self: Self,
         input1: Array,
@@ -223,7 +244,7 @@ class ExponentialTwoDimKernel(Kernel):
             / parameter[1]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def del_k_del_parameter2(
         self: Self,
         input1: Array,
@@ -235,7 +256,7 @@ class ExponentialTwoDimKernel(Kernel):
             * parameter[2]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -249,12 +270,10 @@ class ExponentialTwoDimKernel(Kernel):
 
 @jax.tree_util.register_pytree_node_class
 class ExponentialPolynomialTwoDimKernel(Kernel):
-    def __init__(self, power: int) -> None:
+    def __init__(self: Self, power: int) -> None:
         self.power: int = power
 
-    def tree_flatten(
-        self: Self,
-    ) -> tuple[tuple[()], dict[str, int]]:
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict[str, int]]:
         return (
             (),
             {
@@ -288,7 +307,7 @@ class ExponentialPolynomialTwoDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -316,7 +335,7 @@ class ExponentialPolynomialTwoDimKernel(Kernel):
             * parameter[5]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -327,7 +346,7 @@ class ExponentialPolynomialTwoDimKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -339,7 +358,20 @@ class ExponentialPolynomialTwoDimKernel(Kernel):
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
 class ExponentialPlusExponentialFourDimKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(
+        cls, aux_data, children
+    ) -> "ExponentialPlusExponentialFourDimKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -362,7 +394,7 @@ class ExponentialPlusExponentialFourDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -399,7 +431,7 @@ class ExponentialPlusExponentialFourDimKernel(Kernel):
             * parameter[4]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -410,7 +442,7 @@ class ExponentialPlusExponentialFourDimKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -422,7 +454,20 @@ class ExponentialPlusExponentialFourDimKernel(Kernel):
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
 class ExponentialTimesExponentialFourDimKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(
+        cls, aux_data, children
+    ) -> "ExponentialTimesExponentialFourDimKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -445,7 +490,7 @@ class ExponentialTimesExponentialFourDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -481,7 +526,7 @@ class ExponentialTimesExponentialFourDimKernel(Kernel):
             * parameter[3]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -492,7 +537,7 @@ class ExponentialTimesExponentialFourDimKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -504,7 +549,20 @@ class ExponentialTimesExponentialFourDimKernel(Kernel):
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
 class ExponentialPlusExponentialPlusExponentialSixDimKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(
+        cls, aux_data, children
+    ) -> "ExponentialPlusExponentialPlusExponentialSixDimKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -527,7 +585,7 @@ class ExponentialPlusExponentialPlusExponentialSixDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -576,7 +634,7 @@ class ExponentialPlusExponentialPlusExponentialSixDimKernel(Kernel):
             * parameter[6]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -587,7 +645,7 @@ class ExponentialPlusExponentialPlusExponentialSixDimKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -599,7 +657,20 @@ class ExponentialPlusExponentialPlusExponentialSixDimKernel(Kernel):
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
 class ExponentialTimesExponentialTimesExponentialSixDimKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(
+        cls, aux_data, children
+    ) -> "ExponentialTimesExponentialTimesExponentialSixDimKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -622,7 +693,7 @@ class ExponentialTimesExponentialTimesExponentialSixDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -669,7 +740,7 @@ class ExponentialTimesExponentialTimesExponentialSixDimKernel(Kernel):
             * parameter[4]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -680,7 +751,7 @@ class ExponentialTimesExponentialTimesExponentialSixDimKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,

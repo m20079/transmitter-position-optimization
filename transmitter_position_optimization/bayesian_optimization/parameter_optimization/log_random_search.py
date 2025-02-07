@@ -13,20 +13,18 @@ from jax import Array, random
 @jax.tree_util.register_pytree_node_class
 class LogRandomSearch(ParameterOptimization):
     def __init__(
-        self,
-        count: int,
-        seed: int,
+        self: Self,
         lower_bound: Array,
         upper_bound: Array,
+        count: int,
+        seed: int,
     ) -> None:
-        self.count: int = count
-        self.seed: int = seed
         self.lower_bound: Array = lower_bound
         self.upper_bound: Array = upper_bound
+        self.count: int = count
+        self.seed: int = seed
 
-    def tree_flatten(
-        self: Self,
-    ) -> tuple[tuple[Array, Array], dict[str, int]]:
+    def tree_flatten(self: Self) -> tuple[tuple[Array, Array], dict[str, int]]:
         return (
             (
                 self.lower_bound,
@@ -42,7 +40,7 @@ class LogRandomSearch(ParameterOptimization):
     def tree_unflatten(cls, aux_data, children) -> "LogRandomSearch":
         return cls(*children, **aux_data)
 
-    @partial(jax.jit, static_argnums=(0, 3))
+    @partial(jax.jit, static_argnums=(3,))
     def optimize(
         self: Self,
         input_train_data: Array,

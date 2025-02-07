@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from environment.coordinate import Coordinate
 from environment.receivers import Receivers
-from environment.transmitter import Transmitter
 from jax import Array
 from matplotlib.axes import Axes
 from matplotlib.colorbar import Colorbar
@@ -26,7 +25,7 @@ def plot_rssi_heatmap(
     coordinate: Coordinate,
     vmin: float | None = None,
     vmax: float | None = None,
-    transmitter: Transmitter | None = None,
+    transmitter: None = None,
     receivers: Receivers | None = None,
     transparent: bool = True,
 ) -> None:
@@ -88,14 +87,20 @@ def plot_data_rate_heatmap_single(
     )
     if x_transmitter_positions is not None and y_transmitter_positions is not None:
         for i in range(x_transmitter_positions.size):
-            ax.text(
+            ax.scatter(
                 float(x_transmitter_positions[i]),
                 float(y_transmitter_positions[i]),
-                f"{i + 1}",
                 color="white",
-                ha="center",
-                va="center_baseline",
             )
+            
+            # ax.text(
+            #     float(x_transmitter_positions[i]),
+            #     float(y_transmitter_positions[i]),
+            #     f"{i + 1}",
+            #     color="white",
+            #     ha="center",
+            #     va="center_baseline",
+            # )
     if receivers is not None:
         for i in range(receivers.noise_floor.size):
             ax.scatter(

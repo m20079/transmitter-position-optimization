@@ -52,7 +52,7 @@ def single_transmitter_random_search(
             y_indices=y_indices[final_train_data_index[0]],
         )
     )
-    max_x_indices, max_y_indices = data_rate.get_single_max_transmitter_indices(
+    max_x_indices, max_y_indices = data_rate.get_true_single_transmitter_indices(
         evaluation_function=evaluation_function
     )
     max_x_positions, max_y_positions = (
@@ -135,7 +135,7 @@ def double_transmitter_random_search(
             y_indices=y_indices_b[final_train_data_index[0]],
         )
     )
-    max_indices: Array = data_rate.get_double_max_transmitter_indices(
+    max_indices: Array = data_rate.get_true_double_transmitter_indices(
         evaluation_function=evaluation_function
     )
     pure_max_indices: Array = max_indices[jnp.all(max_indices != -1, axis=1)]
@@ -263,7 +263,7 @@ def triple_transmitter_random_search(
             y_indices=y_indices_c[final_train_data_index[0]],
         )
     )
-    max_indices = data_rate.get_triple_max_transmitter_indices(
+    max_indices = data_rate.get_true_triple_transmitter_indices(
         evaluation_function=evaluation_function
     )
     pure_max_indices: Array = max_indices[jnp.all(max_indices != -1, axis=1)]

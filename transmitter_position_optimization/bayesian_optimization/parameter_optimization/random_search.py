@@ -7,26 +7,25 @@ from bayesian_optimization.kernel.kernel import Kernel
 from bayesian_optimization.parameter_optimization.parameter_optimization import (
     ParameterOptimization,
 )
+from constant import max_log_likelihood
 from jax import Array, random
 
 
 @jax.tree_util.register_pytree_node_class
 class RandomSearch(ParameterOptimization):
     def __init__(
-        self,
-        count: int,
-        seed: int,
+        self: Self,
         lower_bound: Array,
         upper_bound: Array,
+        count: int,
+        seed: int,
     ) -> None:
-        self.count: int = count
-        self.seed: int = seed
         self.lower_bound: Array = lower_bound
         self.upper_bound: Array = upper_bound
+        self.count: int = count
+        self.seed: int = seed
 
-    def tree_flatten(
-        self: Self,
-    ) -> tuple[tuple[Array, Array], dict[str, int]]:
+    def tree_flatten(self: Self) -> tuple[tuple[Array, Array], dict[str, int]]:
         return (
             (
                 self.lower_bound,
@@ -42,7 +41,7 @@ class RandomSearch(ParameterOptimization):
     def tree_unflatten(cls, aux_data, children) -> "RandomSearch":
         return cls(*children, **aux_data)
 
-    @partial(jax.jit, static_argnums=(0, 3))
+    @partial(jax.jit, static_argnums=(3,))
     def optimize(
         self: Self,
         input_train_data: Array,
@@ -74,6 +73,6 @@ class RandomSearch(ParameterOptimization):
                 k_inv=k_inv,
                 output_train_data=output_train_data,
             )
-            return jnp.where(likelihood < 0.0, likelihood, -jnp.inf)
+            return jnp.where(likelihood < max_log_likelihood, likelihood, -jnp.inf)
 
         return parameter.T[jnp.argmax(jax.vmap(body_fn)(parameter.T))]

@@ -14,7 +14,7 @@ from jax import Array
 @jax.tree_util.register_pytree_node_class
 class GradientDescent(ParameterOptimization):
     def __init__(
-        self,
+        self: Self,
         count: int,
         learning_rate: int,
         parameter_optimization: ParameterOptimization,
@@ -37,7 +37,7 @@ class GradientDescent(ParameterOptimization):
     def tree_unflatten(cls, aux_data, children) -> "GradientDescent":
         return cls(*children, **aux_data)
 
-    @partial(jax.jit, static_argnums=(0, 3))
+    @partial(jax.jit, static_argnums=(3,))
     def optimize(
         self: Self,
         input_train_data: Array,

@@ -11,33 +11,36 @@ from jax import Array
 @jax.tree_util.register_pytree_node_class
 class GaussianProcessRegression:
     def __init__(
-        self: "GaussianProcessRegression",
+        self: Self,
         input_train_data: Array,
         output_train_data: Array,
-        kernel: Kernel,
         parameter: Array,
+        kernel: Kernel,
     ) -> None:
         self.input_train_data: Array = input_train_data
         self.output_train_data: Array = output_train_data
-        self.kernel: Kernel = kernel
         self.parameter: Array = parameter
+        self.kernel: Kernel = kernel
 
-    def tree_flatten(self: Self) -> tuple[tuple[Array, Array, Kernel, Array], None]:
+    def tree_flatten(
+        self: Self,
+    ) -> tuple[tuple[Array, Array, Array], dict[str, Kernel]]:
         return (
             (
                 self.input_train_data,
                 self.output_train_data,
-                self.kernel,
                 self.parameter,
             ),
-            None,
+            {
+                "kernel": self.kernel,
+            },
         )
 
     @classmethod
     def tree_unflatten(cls, aux_data, children) -> "GaussianProcessRegression":
-        return cls(*children)
+        return cls(*children, **aux_data)
 
-    @partial(jax.jit, static_argnums=(0, 2))
+    @partial(jax.jit, static_argnums=(2,))
     def function(
         self: Self,
         input_test_data: Array,

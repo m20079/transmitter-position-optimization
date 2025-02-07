@@ -10,7 +10,7 @@ from jax import Array
 
 class ParameterOptimization(metaclass=ABCMeta):
     @abstractmethod
-    @partial(jax.jit, static_argnums=(0, 3))
+    @partial(jax.jit, static_argnums=(3,))
     def optimize(
         self: Self,
         input_train_data: Array,
@@ -19,7 +19,7 @@ class ParameterOptimization(metaclass=ABCMeta):
     ) -> Array:
         pass
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def get_log_likelihood(
         self: Self,
         k: Array,

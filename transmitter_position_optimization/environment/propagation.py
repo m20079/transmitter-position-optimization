@@ -3,39 +3,47 @@ from typing import Any, Self
 
 import jax
 import jax.numpy as jnp
-from constant import data_rate_generation, floating, integer
+from constant import data_rate_generation, floating
 from environment.coordinate import Coordinate
 from environment.data_rate import DataRate
+from environment.distance import get_distance
 from environment.receivers import Receivers
-from environment.transmitter import Transmitter
 from jax import Array, random
+from scipy.constants import c
 
 
 @jax.tree_util.register_pytree_node_class
 class Propagation:
     def __init__(
-        self,
+        self: Self,
+        init_transmitter_x_position: Array,
+        init_transmitter_y_position: Array,
         free_distance: float,
         propagation_coefficient: float,
         distance_correlation: float,
         standard_deviation: float,
-        seed: int,
+        frequency: float,
     ) -> None:
+        self.init_transmitter_x_position: Array = init_transmitter_x_position
+        self.init_transmitter_y_position: Array = init_transmitter_y_position
         self.free_distance: float = free_distance
         self.propagation_coefficient: float = propagation_coefficient
         self.distance_correlation: float = distance_correlation
         self.standard_deviation: float = standard_deviation
-        self.seed: int = seed
+        self.frequency: float = frequency
 
-    def tree_flatten(self: Self) -> tuple[tuple[()], dict["str", Any]]:
+    def tree_flatten(self: Self) -> tuple[tuple[Array, Array], dict[str, Any]]:
         return (
-            (),
+            (
+                self.init_transmitter_x_position,
+                self.init_transmitter_y_position,
+            ),
             {
                 "free_distance": self.free_distance,
                 "propagation_coefficient": self.propagation_coefficient,
                 "distance_correlation": self.distance_correlation,
                 "standard_deviation": self.standard_deviation,
-                "seed": self.seed,
+                "frequency": self.frequency,
             },
         )
 
@@ -43,112 +51,140 @@ class Propagation:
     def tree_unflatten(cls, aux_data, children) -> "Propagation":
         return cls(*children, **aux_data)
 
-    @partial(jax.jit, static_argnums=(0, 1))
-    def update_seed(self: Self, seed: int) -> "Propagation":
-        return Propagation(
-            free_distance=self.free_distance,
-            propagation_coefficient=self.propagation_coefficient,
-            distance_correlation=self.distance_correlation,
-            standard_deviation=self.standard_deviation,
-            seed=seed,
-        )
-
-    @partial(jax.jit, static_argnums=(0, 1, 2))
+    @partial(jax.jit, static_argnums=(1,))
     def create_pathloss(
         self: Self,
         coordinate: Coordinate,
-        transmitter: Transmitter,
+        transmitter_x_position: Array,
+        transmitter_y_position: Array,
     ) -> Array:
+        wavelength: float = c / self.frequency
         x_positions, y_positions = coordinate.create_all_receiver_positions()
-        distance: Array = transmitter.get_transmitter_distance(
-            x_positions=x_positions,
-            y_positions=y_positions,
+        distance: Array = get_distance(
+            x_positions_a=transmitter_x_position,
+            y_positions_a=transmitter_y_position,
+            x_positions_b=x_positions,
+            y_positions_b=y_positions,
         )
         return jnp.where(
             distance < self.free_distance,
-            20.0 * jnp.log10(transmitter.wavelength / (4.0 * jnp.pi * distance)),
-            20.0
-            * jnp.log10(transmitter.wavelength / (4.0 * jnp.pi * self.free_distance))
+            20.0 * jnp.log10(wavelength / (4.0 * jnp.pi * distance)),
+            20.0 * jnp.log10(wavelength / (4.0 * jnp.pi * self.free_distance))
             - 10.0
             * self.propagation_coefficient
             * jnp.log10(distance / self.free_distance),
         )
 
-    @partial(jax.jit, static_argnums=(0, 1, 2))
+    @jax.jit
+    def get_delta_tx(
+        self: Self,
+        transmitter_x_position: Array,
+        transmitter_y_position: Array,
+    ) -> Array:
+        return get_distance(
+            x_positions_a=self.init_transmitter_x_position,
+            y_positions_a=self.init_transmitter_y_position,
+            x_positions_b=transmitter_x_position,
+            y_positions_b=transmitter_y_position,
+        )
+
+    @partial(jax.jit, static_argnums=(1,))
     def create_shadowing(
         self: Self,
         coordinate: Coordinate,
-        transmitter: Transmitter,
+        transmitter_x_position: Array,
+        transmitter_y_position: Array,
+        key: Array,
     ) -> Array:
-        key = random.key(self.seed)
-        delta_tx: Array = transmitter.get_delta_tx()
+        delta_tx: Array = self.get_delta_tx(
+            transmitter_x_position=transmitter_x_position,
+            transmitter_y_position=transmitter_y_position,
+        )
         delta_rx: Array = coordinate.get_delta_rx()
         correlation_matrix: Array = jnp.exp(
             -(delta_tx + delta_rx) / self.distance_correlation * jnp.log(2.0)
         )
         covariance_matrix: Array = correlation_matrix * self.standard_deviation**2.0
         l_covariance_matrix: Array = jnp.linalg.cholesky(covariance_matrix)
-        normal_random = random.normal(
+        normal_random: Array = random.normal(
             key=key, shape=(coordinate.x_mesh * coordinate.y_mesh,)
         )
         return (l_covariance_matrix @ normal_random).reshape(
             (coordinate.y_mesh, coordinate.x_mesh)
         )
 
-    @partial(jax.jit, static_argnums=(0, 3, 4, 5, 6, 7))
+    @partial(jax.jit, static_argnums=(5, 6, 7, 8))
     def get_channel_capacity(
         self: Self,
-        x_index: Array,
-        y_index: Array,
+        receivers_key: Array,
+        shadowing_key: Array,
+        transmitter_x_index: Array,
+        transmitter_y_index: Array,
         coordinate: Coordinate,
-        frequency: float,
-        receivers: Receivers,
-        init_x_position: float,
-        init_y_position: float,
+        receiver_number: int,
+        noise_floor: float,
+        bandwidth: float,
     ) -> Array:
-        x_position, y_position = coordinate.convert_indices_to_transmitter_positions(
-            x_indices=x_index,
-            y_indices=y_index,
+        # 受信機は以下のようにして任意に設定することもできる
+        # receivers = Receivers(
+        #     x_positions=jnp.array([3.0,    7.0,    18.0  ]),
+        #     y_positions=jnp.array([8.0,    13.0,   9.0   ]),
+        #     noise_floor=jnp.array([-90.0,  -92.0,  -89.0 ]),
+        #     bandwidth  =jnp.array([20.0e6, 40.0e6, 20.0e6]),
+        # )
+        receivers: Receivers = coordinate.create_random_position_receivers(
+            key=receivers_key,
+            number=receiver_number,
+            noise_floor=noise_floor,
+            bandwidth=bandwidth,
         )
-        transmitter = Transmitter(
-            x_position=x_position,
-            y_position=y_position,
-            init_x_position=init_x_position,
-            init_y_position=init_y_position,
-            frequency=frequency,
+        transmitter_x_position, transmitter_y_position = (
+            coordinate.convert_indices_to_transmitter_positions(
+                x_indices=transmitter_x_index,
+                y_indices=transmitter_y_index,
+            )
         )
         pathloss: Array = self.create_pathloss(
             coordinate=coordinate,
-            transmitter=transmitter,
+            transmitter_x_position=transmitter_x_position,
+            transmitter_y_position=transmitter_y_position,
         )
         shadowing: Array = self.create_shadowing(
             coordinate=coordinate,
-            transmitter=transmitter,
+            transmitter_x_position=transmitter_x_position,
+            transmitter_y_position=transmitter_y_position,
+            key=shadowing_key,
         )
-        x_index, y_index = coordinate.convert_receiver_positions_to_indices(
-            x_positions=receivers.x_positions,
-            y_positions=receivers.y_positions,
+        receiver_x_indices, receiver_y_indices = (
+            coordinate.convert_receiver_positions_to_indices(
+                x_positions=receivers.x_positions,
+                y_positions=receivers.y_positions,
+            )
         )
         snr: Array = 10.0 ** (
-            ((pathloss + shadowing).at[y_index, x_index].get() - receivers.noise_floor)
+            (
+                (pathloss + shadowing).at[receiver_y_indices, receiver_x_indices].get()
+                - receivers.noise_floor
+            )
             / 10.0
         )
-        return receivers.bandwidth * jnp.log2(1.0 + snr) / 1.0e6
+        return receivers.bandwidth * jnp.log2(1.0 + snr) * 1.0e-6
 
-    @partial(jax.jit, static_argnums=(0, 1, 2, 3, 4, 5))
+    @partial(jax.jit, static_argnums=(3, 4, 5, 6))
     def create_data_rate(
         self: Self,
+        receivers_key: Array,
+        shadowing_key: Array,
         coordinate: Coordinate,
-        receivers: Receivers,
-        frequency: float,
-        init_x_position: float,
-        init_y_position: float,
+        receiver_number: int,
+        noise_floor: float,
+        bandwidth: float,
     ) -> DataRate:
         data_rate: Array = jnp.zeros(
             (
                 coordinate.y_mesh + 1,
                 coordinate.x_mesh + 1,
-                receivers.bandwidth.size,
+                receiver_number,
             ),
             dtype=floating,
         )
@@ -160,13 +196,14 @@ class Propagation:
                 body_fun=lambda y_index, data_rate: data_rate.at[y_index].set(
                     jax.vmap(
                         lambda x_index: self.get_channel_capacity(
-                            x_index=x_index,
-                            y_index=y_index,
+                            transmitter_x_index=x_index,
+                            transmitter_y_index=y_index,
                             coordinate=coordinate,
-                            frequency=frequency,
-                            receivers=receivers,
-                            init_x_position=init_x_position,
-                            init_y_position=init_y_position,
+                            receiver_number=receiver_number,
+                            noise_floor=noise_floor,
+                            bandwidth=bandwidth,
+                            receivers_key=receivers_key,
+                            shadowing_key=shadowing_key,
                         )
                     )(jnp.arange(start=0, stop=coordinate.x_mesh + 1, step=1))
                 ),
@@ -177,13 +214,14 @@ class Propagation:
             return jax.vmap(
                 lambda y_index: jax.vmap(
                     lambda x_index: self.get_channel_capacity(
-                        x_index=x_index,
-                        y_index=y_index,
+                        transmitter_x_index=x_index,
+                        transmitter_y_index=y_index,
                         coordinate=coordinate,
-                        frequency=frequency,
-                        receivers=receivers,
-                        init_x_position=init_x_position,
-                        init_y_position=init_y_position,
+                        receiver_number=receiver_number,
+                        noise_floor=noise_floor,
+                        bandwidth=bandwidth,
+                        receivers_key=receivers_key,
+                        shadowing_key=shadowing_key,
                     )
                 )(jnp.arange(start=0, stop=coordinate.x_mesh + 1, step=1))
             )(jnp.arange(start=0, stop=coordinate.y_mesh + 1, step=1))
@@ -192,21 +230,24 @@ class Propagation:
             return jax.lax.fori_loop(
                 lower=0,
                 upper=coordinate.y_mesh + 1,
-                body_fun=lambda j, data_rate: jax.lax.fori_loop(
+                body_fun=lambda y_index, data_rate_y: jax.lax.fori_loop(
                     lower=0,
                     upper=coordinate.x_mesh + 1,
-                    body_fun=lambda i, data_rate: data_rate.at[j, i].set(
+                    body_fun=lambda x_index, data_rate_x: data_rate_x.at[
+                        y_index, x_index
+                    ].set(
                         self.get_channel_capacity(
-                            x_index=i,
-                            y_index=j,
+                            transmitter_x_index=x_index,
+                            transmitter_y_index=y_index,
                             coordinate=coordinate,
-                            frequency=frequency,
-                            receivers=receivers,
-                            init_x_position=init_x_position,
-                            init_y_position=init_y_position,
+                            receiver_number=receiver_number,
+                            noise_floor=noise_floor,
+                            bandwidth=bandwidth,
+                            receivers_key=receivers_key,
+                            shadowing_key=shadowing_key,
                         )
                     ),
-                    init_val=data_rate,
+                    init_val=data_rate_y,
                 ),
                 init_val=data_rate,
             )

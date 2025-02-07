@@ -14,15 +14,15 @@ from jax import Array, random
 @jax.tree_util.register_pytree_node_class
 class MCMC(ParameterOptimization):
     def __init__(
-        self,
+        self: Self,
+        std_params: Array,
         count: int,
         seed: int,
-        std_params: Array,
         parameter_optimization: ParameterOptimization,
     ) -> None:
+        self.std_params: Array = std_params
         self.count: int = count
         self.seed: int = seed
-        self.std_params: Array = std_params
         self.parameter_optimization: ParameterOptimization = parameter_optimization
 
     def tree_flatten(self: Self) -> tuple[tuple[Array], dict[str, Any]]:
@@ -39,7 +39,7 @@ class MCMC(ParameterOptimization):
     def tree_unflatten(cls, aux_data, children) -> "MCMC":
         return cls(*children, **aux_data)
 
-    @partial(jax.jit, static_argnums=(0, 3))
+    @partial(jax.jit, static_argnums=(3,))
     def optimize(
         self: Self,
         input_train_data: Array,

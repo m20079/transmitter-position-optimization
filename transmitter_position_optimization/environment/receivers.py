@@ -1,15 +1,13 @@
 from typing import Self
 
-import constant
 import jax
-import jax.numpy as jnp
 from jax import Array
 
 
 @jax.tree_util.register_pytree_node_class
 class Receivers:
     def __init__(
-        self,
+        self: Self,
         x_positions: Array,
         y_positions: Array,
         noise_floor: Array,

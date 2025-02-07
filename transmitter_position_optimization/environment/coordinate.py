@@ -24,7 +24,7 @@ class Coordinate:
         self.x_mesh: int = x_mesh
         self.y_mesh: int = y_mesh
 
-    def tree_flatten(self) -> tuple[tuple[()], dict[str, Any]]:
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict[str, Any]]:
         return (
             (),
             {
@@ -39,37 +39,31 @@ class Coordinate:
     def tree_unflatten(cls, aux_data, children) -> "Coordinate":
         return cls(*children, **aux_data)
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def convert_indices_to_receiver_positions(
         self: Self,
         x_indices: Array,
         y_indices: Array,
-    ) -> Array:
-        return jnp.asarray(
-            [
-                x_indices.astype(floating) * self.x_size / float(self.x_mesh)
-                + (self.x_size / float(self.x_mesh) / 2.0),
-                y_indices.astype(floating) * self.y_size / float(self.y_mesh)
-                + (self.y_size / float(self.y_mesh) / 2.0),
-            ],
-            dtype=constant.floating,
+    ) -> tuple[Array, Array]:
+        return (
+            x_indices.astype(floating) * self.x_size / float(self.x_mesh)
+            + (self.x_size / float(self.x_mesh) / 2.0),
+            y_indices.astype(floating) * self.y_size / float(self.y_mesh)
+            + (self.y_size / float(self.y_mesh) / 2.0),
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def convert_indices_to_transmitter_positions(
         self: Self,
         x_indices: Array,
         y_indices: Array,
-    ) -> Array:
-        return jnp.asarray(
-            [
-                x_indices.astype(floating) * self.x_size / float(self.x_mesh),
-                y_indices.astype(floating) * self.y_size / float(self.y_mesh),
-            ],
-            dtype=constant.floating,
+    ) -> tuple[Array, Array]:
+        return (
+            x_indices.astype(floating) * self.x_size / float(self.x_mesh),
+            y_indices.astype(floating) * self.y_size / float(self.y_mesh),
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def convert_transmitter_positions_to_indices(
         self: Self,
         x_positions: Array,
@@ -82,7 +76,7 @@ class Coordinate:
             ]
         ).astype(constant.integer)
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def convert_receiver_positions_to_indices(
         self: Self,
         x_positions: Array,
@@ -95,13 +89,12 @@ class Coordinate:
             ]
         ).astype(constant.integer)
 
-    @partial(jax.jit, static_argnums=(0, 1, 2))
+    @partial(jax.jit, static_argnums=(2,))
     def create_random_receiver_positions(
         self: Self,
-        seed: int,
+        key: Array,
         number: int,
     ) -> Array:
-        key: Array = random.key(seed)
         x_key, y_key = random.split(key)
         return self.convert_indices_to_receiver_positions(
             x_indices=random.randint(
@@ -120,42 +113,42 @@ class Coordinate:
             ),
         )
 
-    @partial(jax.jit, static_argnums=(0, 1, 2, 3, 4))
-    def create_random_receivers(
+    @partial(jax.jit, static_argnums=(2, 3, 4))
+    def create_random_position_receivers(
         self: Self,
-        seed: int,
+        key: Array,
         number: int,
         noise_floor: float,
         bandwidth: float,
     ) -> Receivers:
-        receiver_positions: Array = self.create_random_receiver_positions(
-            seed=seed,
+        x_positions, y_positions = self.create_random_receiver_positions(
+            key=key,
             number=number,
         )
         return Receivers(
-            x_positions=receiver_positions.at[0].get(),
-            y_positions=receiver_positions.at[1].get(),
+            x_positions=x_positions,
+            y_positions=y_positions,
             noise_floor=jnp.full(number, noise_floor),
             bandwidth=jnp.full(number, bandwidth),
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def create_all_receiver_positions(
         self: Self,
     ) -> Array:
-        receiver_positions: Array = self.convert_indices_to_receiver_positions(
+        x_positions, y_positions = self.convert_indices_to_receiver_positions(
             x_indices=jnp.arange(0, stop=int(self.x_mesh), step=1, dtype=integer),
             y_indices=jnp.arange(0, stop=int(self.y_mesh), step=1, dtype=integer),
         )
         return jnp.asarray(
             jnp.meshgrid(
-                receiver_positions.at[0].get(),
-                receiver_positions.at[1].get(),
+                x_positions,
+                y_positions,
             ),
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def get_delta_rx(
         self: Self,
     ) -> Array:
@@ -167,29 +160,28 @@ class Coordinate:
             y_positions_b=y_positions.ravel()[:, None],
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def create_all_transmitter_positions(
         self: Self,
     ) -> Array:
-        transmitter_positions: Array = self.convert_indices_to_transmitter_positions(
+        x_positions, y_positions = self.convert_indices_to_transmitter_positions(
             x_indices=jnp.arange(0, stop=int(self.x_mesh) + 1, step=1, dtype=integer),
             y_indices=jnp.arange(0, stop=int(self.y_mesh) + 1, step=1, dtype=integer),
         )
         return jnp.asarray(
             jnp.meshgrid(
-                transmitter_positions.at[0].get(),
-                transmitter_positions.at[1].get(),
+                x_positions,
+                y_positions,
             ),
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0, 1, 2))
+    @partial(jax.jit, static_argnums=(2,))
     def create_random_transmitter_indices(
         self: Self,
-        seed: int,
+        key: Array,
         number: int,
     ) -> Array:
-        key: Array = random.key(seed)
         x_key, y_key = random.split(key)
         return jnp.asarray(
             [
@@ -211,7 +203,7 @@ class Coordinate:
             dtype=constant.integer,
         )
 
-    @partial(jax.jit, static_argnums=(0, 1))
+    @partial(jax.jit, static_argnums=(1,))
     def create_grid_transmitter_indices(
         self: Self,
         number: int,
@@ -224,25 +216,31 @@ class Coordinate:
             jnp.meshgrid(x_grid, y_grid), dtype=constant.integer
         ).reshape(2, -1)
 
-    @partial(jax.jit, static_argnums=(0, 1, 2))
+    @partial(jax.jit, static_argnums=(2,))
     def create_random_transmitter_positions(
         self: Self,
-        seed: int,
+        key: Array,
         number: int,
     ) -> Array:
-        x_indices, y_indices = self.create_random_transmitter_indices(seed, number)
+        x_indices, y_indices = self.create_random_transmitter_indices(key, number)
         return self.convert_indices_to_transmitter_positions(
             x_indices=x_indices,
             y_indices=y_indices,
         )
+
+    @jax.jit
+    def get_search_number(
+        self: Self,
+    ) -> int:
+        return (self.x_mesh + 1) * (self.y_mesh + 1)
 
     def get_receivers_extent(
         self: Self,
     ) -> tuple[float, float, float, float]:
         return (
             0.0,
-            float(self.x_size),
-            float(self.y_size),
+            self.x_size,
+            self.y_size,
             0.0,
         )
 
@@ -257,6 +255,3 @@ class Coordinate:
             self.y_size + y_half_size,
             -y_half_size,
         )
-
-    def get_search_number(self: Self) -> int:
-        return (self.x_mesh + 1) * (self.y_mesh + 1)

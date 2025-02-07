@@ -14,7 +14,7 @@ from jax import Array
 @jax.tree_util.register_pytree_node_class
 class Newton(ParameterOptimization):
     def __init__(
-        self,
+        self: Self,
         count: int,
         parameter_optimization: ParameterOptimization,
     ) -> None:
@@ -34,7 +34,7 @@ class Newton(ParameterOptimization):
     def tree_unflatten(cls, aux_data, children) -> "Newton":
         return cls(*children, **aux_data)
 
-    @partial(jax.jit, static_argnums=(0, 3))
+    @partial(jax.jit, static_argnums=(3,))
     def optimize(
         self: Self,
         input_train_data: Array,

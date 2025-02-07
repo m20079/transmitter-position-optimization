@@ -1,4 +1,3 @@
-from functools import partial
 from typing import Self
 
 import constant
@@ -8,7 +7,18 @@ from bayesian_optimization.kernel.kernel import Kernel
 from jax import Array
 
 
+@jax.tree_util.register_pytree_node_class
 class GaussianKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(cls, aux_data, children) -> "GaussianKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -31,7 +41,7 @@ class GaussianKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -43,7 +53,7 @@ class GaussianKernel(Kernel):
             + self.delta(input1[0] - input2[0]) * parameter[2]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -73,7 +83,7 @@ class GaussianKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -167,7 +177,7 @@ class GaussianKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def del_k_del_parameter0(
         self: Self,
         input1: Array,
@@ -178,7 +188,7 @@ class GaussianKernel(Kernel):
             -jnp.power(input1[0] - input2[0], 2) / parameter[1]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def del_k_del_parameter1(
         self: Self,
         input1: Array,
@@ -189,7 +199,7 @@ class GaussianKernel(Kernel):
             jnp.power(input1[0] - input2[0], 2) / parameter[1]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def del_k_del_parameter2(
         self: Self,
         input1: Array,
@@ -198,7 +208,7 @@ class GaussianKernel(Kernel):
     ) -> Array:
         return self.delta(input1[0] - input2[0]) * parameter[2]
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def del_squared_k_del_squared_parameter0(
         self: Self,
         input1: Array,
@@ -207,7 +217,7 @@ class GaussianKernel(Kernel):
     ) -> Array:
         return self.del_k_del_parameter0(input1, input2, parameter)
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def del_squared_k_del_parameter0_del_parameter1(
         self: Self,
         input1: Array,
@@ -216,14 +226,14 @@ class GaussianKernel(Kernel):
     ) -> Array:
         return self.del_k_del_parameter1(input1, input2, parameter)
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def del_squared_k_del_parameter0_del_parameter2(
         self: Self,
         k_inv: Array,
     ) -> Array:
         return jnp.zeros(k_inv.shape)
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def del_squared_k_del_squared_parameter1(
         self: Self,
         input1: Array,
@@ -234,14 +244,14 @@ class GaussianKernel(Kernel):
             (jnp.power(input1[0] - input2[0], 2) / parameter[1]) - 1.0
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def del_squared_k_del_parameter1_del_parameter2(
         self: Self,
         k_inv: Array,
     ) -> Array:
         return self.del_squared_k_del_parameter0_del_parameter2(k_inv)
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def del_squared_k_del_squared_parameter2(
         self: Self,
         input1: Array,
@@ -251,7 +261,18 @@ class GaussianKernel(Kernel):
         return self.del_k_del_parameter2(input1, input2, parameter)
 
 
+@jax.tree_util.register_pytree_node_class
 class GaussianTwoDimKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(cls, aux_data, children) -> "GaussianTwoDimKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -274,7 +295,7 @@ class GaussianTwoDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -296,7 +317,7 @@ class GaussianTwoDimKernel(Kernel):
             * parameter[2]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -326,7 +347,7 @@ class GaussianTwoDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def del_k_del_parameter0(
         self: Self,
         input1: Array,
@@ -338,7 +359,7 @@ class GaussianTwoDimKernel(Kernel):
             / parameter[1]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def del_k_del_parameter1(
         self: Self,
         input1: Array,
@@ -350,7 +371,7 @@ class GaussianTwoDimKernel(Kernel):
             / parameter[1]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def del_k_del_parameter2(
         self: Self,
         input1: Array,
@@ -362,7 +383,7 @@ class GaussianTwoDimKernel(Kernel):
             * parameter[2]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -376,15 +397,10 @@ class GaussianTwoDimKernel(Kernel):
 
 @jax.tree_util.register_pytree_node_class
 class GaussianPolynomialTwoDimKernel(Kernel):
-    def __init__(
-        self,
-        power: int,
-    ) -> None:
+    def __init__(self: Self, power: int) -> None:
         self.power: int = power
 
-    def tree_flatten(
-        self: Self,
-    ) -> tuple[tuple[()], dict[str, int]]:
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict[str, int]]:
         return (
             (),
             {
@@ -418,7 +434,7 @@ class GaussianPolynomialTwoDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -446,7 +462,7 @@ class GaussianPolynomialTwoDimKernel(Kernel):
             * parameter[5]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -457,7 +473,7 @@ class GaussianPolynomialTwoDimKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -469,7 +485,18 @@ class GaussianPolynomialTwoDimKernel(Kernel):
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
 class GaussianPlusGaussianFourDimKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(cls, aux_data, children) -> "GaussianPlusGaussianFourDimKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -492,7 +519,7 @@ class GaussianPlusGaussianFourDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -525,7 +552,7 @@ class GaussianPlusGaussianFourDimKernel(Kernel):
             * parameter[4]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -536,7 +563,7 @@ class GaussianPlusGaussianFourDimKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -548,7 +575,18 @@ class GaussianPlusGaussianFourDimKernel(Kernel):
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
 class GaussianTimesGaussianFourDimKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(cls, aux_data, children) -> "GaussianTimesGaussianFourDimKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -571,7 +609,7 @@ class GaussianTimesGaussianFourDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -603,7 +641,7 @@ class GaussianTimesGaussianFourDimKernel(Kernel):
             * parameter[3]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -614,7 +652,7 @@ class GaussianTimesGaussianFourDimKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -626,7 +664,20 @@ class GaussianTimesGaussianFourDimKernel(Kernel):
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
 class GaussianPlusGaussianPlusGaussianSixDimKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(
+        cls, aux_data, children
+    ) -> "GaussianPlusGaussianPlusGaussianSixDimKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -649,7 +700,7 @@ class GaussianPlusGaussianPlusGaussianSixDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -692,7 +743,7 @@ class GaussianPlusGaussianPlusGaussianSixDimKernel(Kernel):
             * parameter[6]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -703,7 +754,7 @@ class GaussianPlusGaussianPlusGaussianSixDimKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -715,7 +766,20 @@ class GaussianPlusGaussianPlusGaussianSixDimKernel(Kernel):
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
 class GaussianTimesGaussianTimesGaussianSixDimKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(
+        cls, aux_data, children
+    ) -> "GaussianTimesGaussianTimesGaussianSixDimKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -738,7 +802,7 @@ class GaussianTimesGaussianTimesGaussianSixDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -779,7 +843,7 @@ class GaussianTimesGaussianTimesGaussianSixDimKernel(Kernel):
             * parameter[4]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -790,7 +854,7 @@ class GaussianTimesGaussianTimesGaussianSixDimKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,

@@ -1,4 +1,3 @@
-from functools import partial
 from typing import Self
 
 import constant
@@ -8,10 +7,21 @@ from bayesian_optimization.kernel.kernel import Kernel
 from jax import Array
 
 
+@jax.tree_util.register_pytree_node_class
 class RationalQuadraticKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(cls, aux_data, children) -> "RationalQuadraticKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
-    def random_search_range():
+    def random_search_range() -> Array:
         return jnp.asarray(
             [
                 [0.0, 0.0, 0.0, 0.0],
@@ -31,7 +41,7 @@ class RationalQuadraticKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -50,7 +60,7 @@ class RationalQuadraticKernel(Kernel):
             + self.delta(input_abs) * parameter[3]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -61,7 +71,7 @@ class RationalQuadraticKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -73,7 +83,18 @@ class RationalQuadraticKernel(Kernel):
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
 class RationalQuadraticTwoDimKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(cls, aux_data, children) -> "RationalQuadraticTwoDimKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range():
@@ -96,7 +117,7 @@ class RationalQuadraticTwoDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -117,7 +138,7 @@ class RationalQuadraticTwoDimKernel(Kernel):
             + self.delta(input_abs) * parameter[3]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -128,7 +149,7 @@ class RationalQuadraticTwoDimKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -140,13 +161,12 @@ class RationalQuadraticTwoDimKernel(Kernel):
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
 class RationalQuadraticPolynomialTwoDimKernel(Kernel):
-    def __init__(self, power: int) -> None:
+    def __init__(self: Self, power: int) -> None:
         self.power: int = power
 
-    def tree_flatten(
-        self: Self,
-    ) -> tuple[tuple[()], dict[str, int]]:
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict[str, int]]:
         return (
             (),
             {
@@ -182,7 +202,7 @@ class RationalQuadraticPolynomialTwoDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -209,7 +229,7 @@ class RationalQuadraticPolynomialTwoDimKernel(Kernel):
             + self.delta(input_abs) * parameter[6]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -220,7 +240,7 @@ class RationalQuadraticPolynomialTwoDimKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -232,7 +252,20 @@ class RationalQuadraticPolynomialTwoDimKernel(Kernel):
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
 class RationalQuadraticPlusRationalQuadraticFourDimKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(
+        cls, aux_data, children
+    ) -> "RationalQuadraticPlusRationalQuadraticFourDimKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -255,7 +288,7 @@ class RationalQuadraticPlusRationalQuadraticFourDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -286,7 +319,7 @@ class RationalQuadraticPlusRationalQuadraticFourDimKernel(Kernel):
             + self.delta(input_abs1 + input_abs2) * parameter[6]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -297,7 +330,7 @@ class RationalQuadraticPlusRationalQuadraticFourDimKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -309,7 +342,20 @@ class RationalQuadraticPlusRationalQuadraticFourDimKernel(Kernel):
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
 class RationalQuadraticTimesRationalQuadraticFourDimKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(
+        cls, aux_data, children
+    ) -> "RationalQuadraticTimesRationalQuadraticFourDimKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -332,7 +378,7 @@ class RationalQuadraticTimesRationalQuadraticFourDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -362,7 +408,7 @@ class RationalQuadraticTimesRationalQuadraticFourDimKernel(Kernel):
             + self.delta(input_abs1 + input_abs2) * parameter[5]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -373,7 +419,7 @@ class RationalQuadraticTimesRationalQuadraticFourDimKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -385,7 +431,20 @@ class RationalQuadraticTimesRationalQuadraticFourDimKernel(Kernel):
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
 class RationalQuadraticPlusRationalQuadraticPlusRationalQuadraticSixDimKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(
+        cls, aux_data, children
+    ) -> "RationalQuadraticPlusRationalQuadraticPlusRationalQuadraticSixDimKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -430,7 +489,7 @@ class RationalQuadraticPlusRationalQuadraticPlusRationalQuadraticSixDimKernel(Ke
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -471,7 +530,7 @@ class RationalQuadraticPlusRationalQuadraticPlusRationalQuadraticSixDimKernel(Ke
             + self.delta(input_abs1 + input_abs2) * parameter[9]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -482,7 +541,7 @@ class RationalQuadraticPlusRationalQuadraticPlusRationalQuadraticSixDimKernel(Ke
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -494,7 +553,20 @@ class RationalQuadraticPlusRationalQuadraticPlusRationalQuadraticSixDimKernel(Ke
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
 class RationalQuadraticTimesRationalQuadraticTimesRationalQuadraticSixDimKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(
+        cls, aux_data, children
+    ) -> "RationalQuadraticTimesRationalQuadraticTimesRationalQuadraticSixDimKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -517,7 +589,7 @@ class RationalQuadraticTimesRationalQuadraticTimesRationalQuadraticSixDimKernel(
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -556,7 +628,7 @@ class RationalQuadraticTimesRationalQuadraticTimesRationalQuadraticSixDimKernel(
             + self.delta(input_abs1 + input_abs2) * parameter[7]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -567,7 +639,7 @@ class RationalQuadraticTimesRationalQuadraticTimesRationalQuadraticSixDimKernel(
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,

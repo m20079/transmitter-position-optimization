@@ -1,4 +1,3 @@
-from functools import partial
 from typing import Self
 
 import constant
@@ -8,7 +7,18 @@ from bayesian_optimization.kernel.kernel import Kernel
 from jax import Array
 
 
+@jax.tree_util.register_pytree_node_class
 class Matern3Kernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(cls, aux_data, children) -> "Matern3Kernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -31,7 +41,7 @@ class Matern3Kernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -46,7 +56,7 @@ class Matern3Kernel(Kernel):
             + self.delta(input_abs) * parameter[2]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -57,7 +67,7 @@ class Matern3Kernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -69,7 +79,18 @@ class Matern3Kernel(Kernel):
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
 class Matern3TwoDimKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(cls, aux_data, children) -> "Matern3TwoDimKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -92,7 +113,7 @@ class Matern3TwoDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -109,7 +130,7 @@ class Matern3TwoDimKernel(Kernel):
             + self.delta(input_abs) * parameter[2]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -120,7 +141,7 @@ class Matern3TwoDimKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -134,12 +155,10 @@ class Matern3TwoDimKernel(Kernel):
 
 @jax.tree_util.register_pytree_node_class
 class Matern3PolynomialTwoDimKernel(Kernel):
-    def __init__(self, power: int) -> None:
+    def __init__(self: Self, power: int) -> None:
         self.power: int = power
 
-    def tree_flatten(
-        self: Self,
-    ) -> tuple[tuple[()], dict[str, int]]:
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict[str, int]]:
         return (
             (),
             {
@@ -173,7 +192,7 @@ class Matern3PolynomialTwoDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -196,7 +215,7 @@ class Matern3PolynomialTwoDimKernel(Kernel):
             + self.delta(input_abs) * parameter[5]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -207,7 +226,7 @@ class Matern3PolynomialTwoDimKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -219,7 +238,18 @@ class Matern3PolynomialTwoDimKernel(Kernel):
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
 class Matern3PlusMatern3FourDimKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(cls, aux_data, children) -> "Matern3PlusMatern3FourDimKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -242,7 +272,7 @@ class Matern3PlusMatern3FourDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -265,7 +295,7 @@ class Matern3PlusMatern3FourDimKernel(Kernel):
             + self.delta(input_abs1 + input_abs2) * parameter[4]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -276,7 +306,7 @@ class Matern3PlusMatern3FourDimKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -288,7 +318,18 @@ class Matern3PlusMatern3FourDimKernel(Kernel):
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
 class Matern3TimesMatern3FourDimKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(cls, aux_data, children) -> "Matern3TimesMatern3FourDimKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -311,7 +352,7 @@ class Matern3TimesMatern3FourDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -333,7 +374,7 @@ class Matern3TimesMatern3FourDimKernel(Kernel):
             + self.delta(input_abs1 + input_abs2) * parameter[3]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -344,7 +385,7 @@ class Matern3TimesMatern3FourDimKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -356,7 +397,20 @@ class Matern3TimesMatern3FourDimKernel(Kernel):
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
 class Matern3PlusMatern3PlusMatern3SixDimKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(
+        cls, aux_data, children
+    ) -> "Matern3PlusMatern3PlusMatern3SixDimKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -379,7 +433,7 @@ class Matern3PlusMatern3PlusMatern3SixDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -408,7 +462,7 @@ class Matern3PlusMatern3PlusMatern3SixDimKernel(Kernel):
             + self.delta(input_abs1 + input_abs2 + input_abs3) * parameter[6]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -419,7 +473,7 @@ class Matern3PlusMatern3PlusMatern3SixDimKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
@@ -431,7 +485,20 @@ class Matern3PlusMatern3PlusMatern3SixDimKernel(Kernel):
         return jnp.asarray([])
 
 
+@jax.tree_util.register_pytree_node_class
 class Matern3TimesMatern3TimesMatern3SixDimKernel(Kernel):
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+        return (
+            (),
+            {},
+        )
+
+    @classmethod
+    def tree_unflatten(
+        cls, aux_data, children
+    ) -> "Matern3TimesMatern3TimesMatern3SixDimKernel":
+        return cls(*children, **aux_data)
+
     @staticmethod
     @jax.jit
     def random_search_range() -> Array:
@@ -454,7 +521,7 @@ class Matern3TimesMatern3TimesMatern3SixDimKernel(Kernel):
             dtype=constant.floating,
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def function(
         self: Self,
         input1: Array,
@@ -481,7 +548,7 @@ class Matern3TimesMatern3TimesMatern3SixDimKernel(Kernel):
             + self.delta(input_abs1 + input_abs2 + input_abs3) * parameter[4]
         )
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def gradient(
         self: Self,
         input1: Array,
@@ -492,7 +559,7 @@ class Matern3TimesMatern3TimesMatern3SixDimKernel(Kernel):
     ) -> Array:
         return jnp.asarray([])
 
-    @partial(jax.jit, static_argnums=(0,))
+    @jax.jit
     def hessian_matrix(
         self: Self,
         input1: Array,
