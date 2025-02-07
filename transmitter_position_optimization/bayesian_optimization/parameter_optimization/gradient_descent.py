@@ -15,20 +15,19 @@ from jax import Array
 class GradientDescent(ParameterOptimization):
     def __init__(
         self: Self,
+        learning_rate: Array,
         count: int,
-        learning_rate: int,
         parameter_optimization: ParameterOptimization,
     ) -> None:
+        self.learning_rate: Array = learning_rate
         self.count: int = count
-        self.learning_rate: int = learning_rate
         self.parameter_optimization: ParameterOptimization = parameter_optimization
 
-    def tree_flatten(self: Self) -> tuple[tuple[()], dict[str, Any]]:
+    def tree_flatten(self: Self) -> tuple[tuple[Array], dict[str, Any]]:
         return (
-            (),
+            (self.learning_rate,),
             {
                 "count": self.count,
-                "learning_rate": self.learning_rate,
                 "parameter_optimization": self.parameter_optimization,
             },
         )
@@ -54,7 +53,9 @@ class GradientDescent(ParameterOptimization):
         )
 
         @jax.jit
-        def body_fun(_, parameter: Array) -> Array:
+        def body_fun(_, val: tuple[Array, Array, Array]) -> tuple[Array, Array, Array]:
+            max_parameter, max_log_likelihood, parameter = val
+
             k: Array = kernel.create_k(
                 input_train_data=input_train_data,
                 parameter=parameter,
@@ -66,6 +67,35 @@ class GradientDescent(ParameterOptimization):
                 k_inv=k_inv,
                 parameter=parameter,
             )
-            return jnp.clip(parameter + self.learning_rate * gradient, min=min, max=max)
+            log_likelihood: Array = self.get_log_likelihood(
+                k=k,
+                k_inv=k_inv,
+                output_train_data=output_train_data,
+            )
+            new_parameter: Array = jnp.clip(
+                parameter + self.learning_rate * gradient, min=min, max=max
+            )
 
-        return jax.lax.fori_loop(0, self.count, body_fun, init_parameter)
+            return (
+                jnp.where(
+                    log_likelihood > max_log_likelihood,
+                    new_parameter,
+                    max_parameter,
+                ),
+                jnp.where(
+                    log_likelihood > max_log_likelihood,
+                    log_likelihood,
+                    max_log_likelihood,
+                ),
+                new_parameter,
+            )
+
+        init_val: tuple[Array, Array, Array] = (
+            init_parameter,
+            jnp.asarray(-jnp.inf, dtype=constant.floating),
+            init_parameter,
+        )
+
+        parameter, _, _ = jax.lax.fori_loop(0, self.count, body_fun, init_val)
+
+        return parameter

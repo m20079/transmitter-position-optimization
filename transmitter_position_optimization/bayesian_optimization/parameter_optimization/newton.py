@@ -51,7 +51,9 @@ class Newton(ParameterOptimization):
         )
 
         @jax.jit
-        def body_fun(_, parameter: Array) -> Array:
+        def body_fun(_, val: tuple[Array, Array, Array]) -> tuple[Array, Array, Array]:
+            max_parameter, max_log_likelihood, parameter = val
+
             k: Array = kernel.create_k(
                 input_train_data=input_train_data,
                 parameter=parameter,
@@ -70,6 +72,34 @@ class Newton(ParameterOptimization):
                 parameter=parameter,
             )
             hessian_matrix_inv: Array = jnp.linalg.inv(hessian_matrix)
-            return jnp.clip(parameter + hessian_matrix_inv @ gradient, min=min, max=max)
+            log_likelihood: Array = self.get_log_likelihood(
+                k=k,
+                k_inv=k_inv,
+                output_train_data=output_train_data,
+            )
+            new_parameter: Array = jnp.clip(
+                parameter - hessian_matrix_inv @ gradient, min=min, max=max
+            )
+            return (
+                jnp.where(
+                    log_likelihood > max_log_likelihood,
+                    new_parameter,
+                    max_parameter,
+                ),
+                jnp.where(
+                    log_likelihood > max_log_likelihood,
+                    log_likelihood,
+                    max_log_likelihood,
+                ),
+                new_parameter,
+            )
 
-        return jax.lax.fori_loop(0, self.count, body_fun, init_parameter)
+        init_val: tuple[Array, Array, Array] = (
+            init_parameter,
+            jnp.asarray(-jnp.inf, dtype=constant.floating),
+            init_parameter,
+        )
+
+        parameter, _, _ = jax.lax.fori_loop(0, self.count, body_fun, init_val)
+
+        return parameter

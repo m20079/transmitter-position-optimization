@@ -1,5 +1,3 @@
-from typing import Literal
-
 import constant
 import japanize_matplotlib
 import jax
@@ -10,10 +8,14 @@ from bayesian_optimization.acquisition import Acquisition
 from bayesian_optimization.bayesian_optimization import (
     single_transmitter_bayesian_optimization,
 )
+from bayesian_optimization.gaussian_process_regression import (
+    GaussianProcessRegression,
+)
 from bayesian_optimization.kernel.exponential_kernel import (
     ExponentialTwoDimKernel,
 )
 from bayesian_optimization.kernel.gaussian_kernel import (
+    GaussianKernel,
     GaussianTwoDimKernel,
 )
 from bayesian_optimization.kernel.kernel import Kernel
@@ -23,8 +25,17 @@ from bayesian_optimization.kernel.matern3_kernel import (
 from bayesian_optimization.kernel.matern5_kernel import (
     Matern5TwoDimKernel,
 )
+from bayesian_optimization.parameter_optimization.gradient_descent import (
+    GradientDescent,
+)
+from bayesian_optimization.parameter_optimization.log_random_search import (
+    LogRandomSearch,
+)
 from bayesian_optimization.parameter_optimization.mcmc import (
     MCMC,
+)
+from bayesian_optimization.parameter_optimization.newton import (
+    Newton,
 )
 from bayesian_optimization.parameter_optimization.random_search import (
     RandomSearch,
@@ -58,17 +69,40 @@ if __name__ == "__main__":
         init_transmitter_x_position=jnp.asarray(coordinate.x_size / 2.0),
         init_transmitter_y_position=jnp.asarray(coordinate.y_size / 2.0),
     )
-    pathloss = propagation.create_pathloss(
-        coordinate=coordinate,
-        transmitter_x_position=jnp.asarray(0.0),
-        transmitter_y_position=jnp.asarray(0.0),
+    parameter_optimization = Newton(
+        count=1000,
+        # learning_rate=jnp.asarray([0.1, 0.1, 0.0001], dtype=constant.floating),
+        parameter_optimization=LogRandomSearch(
+            lower_bound=jnp.asarray([0.1, 0.1, 0.00001], dtype=constant.floating),
+            upper_bound=jnp.asarray([100000.0, 100000.0, 0.1], dtype=constant.floating),
+            count=10,
+            seed=0,
+        ),
     )
-    shadowing = propagation.create_shadowing(
-        coordinate=coordinate,
-        transmitter_x_position=jnp.asarray(0.0),
-        transmitter_y_position=jnp.asarray(0.0),
-        key=random.key(1),
+    parameter: jax.Array = parameter_optimization.optimize(
+        input_train_data=jnp.array([[1.0, 2.0, 3.0]]),
+        output_train_data=jnp.array([1.0, 2.0, 3.0]),
+        kernel=GaussianKernel(),
     )
+    print(parameter)
+    gaussian_process = GaussianProcessRegression(
+        input_train_data=jnp.array([[1.0, 2.0, 3.0]]),
+        output_train_data=jnp.array([1.0, 2.0, 3.0]),
+        kernel=GaussianKernel(),
+        parameter=parameter,
+    )
+
+    # pathloss = propagation.create_pathloss(
+    #     coordinate=coordinate,
+    #     transmitter_x_position=jnp.asarray(0.0),
+    #     transmitter_y_position=jnp.asarray(0.0),
+    # )
+    # shadowing = propagation.create_shadowing(
+    #     coordinate=coordinate,
+    #     transmitter_x_position=jnp.asarray(0.0),
+    #     transmitter_y_position=jnp.asarray(0.0),
+    #     key=random.key(1),
+    # )
 
     result: tuple[int, float, float] = single_transmitter_bayesian_optimization(
         propagation=propagation,
