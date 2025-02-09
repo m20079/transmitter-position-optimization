@@ -12,7 +12,7 @@ from jax import Array
 
 
 @jax.tree_util.register_pytree_node_class
-class Newton(ParameterOptimization):
+class ConjugateGradient(ParameterOptimization):
     def __init__(
         self: Self,
         count: int,
@@ -31,7 +31,7 @@ class Newton(ParameterOptimization):
         )
 
     @classmethod
-    def tree_unflatten(cls, aux_data, children) -> "Newton":
+    def tree_unflatten(cls, aux_data, children) -> "ConjugateGradient":
         return cls(*children, **aux_data)
 
     @partial(jax.jit, static_argnums=(3,))
@@ -50,9 +50,23 @@ class Newton(ParameterOptimization):
             kernel=kernel,
         )
 
+        init_k: Array = kernel.create_k(
+            input_train_data=input_train_data,
+            parameter=init_parameter,
+        )
+        init_k_inv: Array = jnp.linalg.inv(init_k)
+        init_gradient: Array = kernel.create_gradient(
+            input_train_data=input_train_data,
+            output_train_data=output_train_data,
+            k_inv=init_k_inv,
+            parameter=init_parameter,
+        )
+
         @jax.jit
-        def body_fun(_, val: tuple[Array, Array, Array]) -> tuple[Array, Array, Array]:
-            max_parameter, max_log_likelihood, parameter = val
+        def body_fun(
+            _, val: tuple[Array, Array, Array, Array]
+        ) -> tuple[Array, Array, Array, Array]:
+            max_parameter, max_log_likelihood, parameter, d = val
 
             k: Array = kernel.create_k(
                 input_train_data=input_train_data,
@@ -71,15 +85,38 @@ class Newton(ParameterOptimization):
                 k_inv=k_inv,
                 parameter=parameter,
             )
-            hessian_matrix_inv: Array = jnp.linalg.inv(hessian_matrix)
+
+            g: Array = (
+                -(
+                    (jnp.expand_dims(gradient, axis=0) @ jnp.expand_dims(d, axis=1))
+                    / (
+                        jnp.expand_dims(d, axis=0)
+                        @ hessian_matrix
+                        @ jnp.expand_dims(d, axis=1)
+                    )
+                ).ravel()
+                * d
+            )
+
+            next_parameter: Array = jnp.clip(parameter + g, min, max)
+            next_k: Array = kernel.create_k(
+                input_train_data=input_train_data,
+                parameter=next_parameter,
+            )
+            next_k_inv: Array = jnp.linalg.inv(next_k)
+            next_gradient: Array = kernel.create_gradient(
+                input_train_data=input_train_data,
+                output_train_data=output_train_data,
+                k_inv=next_k_inv,
+                parameter=next_parameter,
+            )
+
             log_likelihood: Array = self.get_log_likelihood(
-                k=k,
-                k_inv=k_inv,
+                k=next_k,
+                k_inv=next_k_inv,
                 output_train_data=output_train_data,
             )
-            next_parameter: Array = jnp.clip(
-                parameter - hessian_matrix_inv @ gradient, min=min, max=max
-            )
+
             return (
                 jnp.where(
                     log_likelihood > max_log_likelihood,
@@ -92,14 +129,31 @@ class Newton(ParameterOptimization):
                     max_log_likelihood,
                 ),
                 next_parameter,
+                -next_gradient
+                + (
+                    (
+                        (
+                            jnp.expand_dims(next_gradient, axis=0)
+                            @ hessian_matrix
+                            @ jnp.expand_dims(d, axis=1)
+                        )
+                        / (
+                            jnp.expand_dims(d, axis=0)
+                            @ hessian_matrix
+                            @ jnp.expand_dims(d, axis=1)
+                        )
+                    ).ravel()
+                    * d
+                ),
             )
 
-        init_val: tuple[Array, Array, Array] = (
+        init_val: tuple[Array, Array, Array, Array] = (
             init_parameter,
             jnp.asarray(-jnp.inf, dtype=floating),
             init_parameter,
+            -init_gradient,
         )
 
-        parameter, _, _ = jax.lax.fori_loop(0, self.count, body_fun, init_val)
+        parameter, _, _, _ = jax.lax.fori_loop(0, self.count, body_fun, init_val)
 
         return parameter

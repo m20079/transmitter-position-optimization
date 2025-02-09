@@ -1,10 +1,10 @@
 from functools import partial
 from typing import Self
 
-import constant
 import jax
 import jax.numpy as jnp
 from bayesian_optimization.kernel.kernel import Kernel
+from constant import floating
 from jax import Array
 
 
@@ -62,4 +62,4 @@ class GaussianProcessRegression:
             )
         )
 
-        return jnp.asarray([mean, std], dtype=constant.floating)
+        return jnp.asarray([mean, std], dtype=floating)

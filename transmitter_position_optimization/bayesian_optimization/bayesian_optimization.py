@@ -1,4 +1,3 @@
-import constant
 import jax
 import jax.numpy as jnp
 from bayesian_optimization.gaussian_process_regression import (
@@ -8,6 +7,7 @@ from bayesian_optimization.kernel.kernel import Kernel
 from bayesian_optimization.parameter_optimization.parameter_optimization import (
     ParameterOptimization,
 )
+from constant import floating, integer
 from environment.coordinate import Coordinate
 from environment.data_rate import DataRate
 from environment.distance import get_distance
@@ -52,12 +52,12 @@ def single_transmitter_bayesian_optimization(
             x_transmitter_positions.ravel(),
             y_transmitter_positions.ravel(),
         ],
-        dtype=constant.floating,
+        dtype=floating,
     )
 
     count = 0
-    min_distance = jnp.asarray(0, dtype=constant.integer)
-    data_rate_error = jnp.asarray(0, dtype=constant.integer)
+    min_distance = jnp.asarray(0, dtype=integer)
+    data_rate_error = jnp.asarray(0, dtype=integer)
 
     for count in range(x_train_indices.size, max_search_number):
         input_train_data: Array = jnp.asarray(
@@ -111,7 +111,7 @@ def single_transmitter_bayesian_optimization(
                             x_train_indices,
                             y_train_indices,
                         ],
-                        dtype=constant.integer,
+                        dtype=integer,
                     )
                 ),
                 axis=0,
@@ -200,10 +200,10 @@ def double_transmitter_bayesian_optimization(
     )
 
     count = 0
-    min_distance = jnp.asarray(0, dtype=constant.integer)
-    min_distance_a = jnp.asarray(0, dtype=constant.integer)
-    min_distance_b = jnp.asarray(0, dtype=constant.integer)
-    data_rate_error = jnp.asarray(0, dtype=constant.integer)
+    min_distance = jnp.asarray(0, dtype=integer)
+    min_distance_a = jnp.asarray(0, dtype=integer)
+    min_distance_b = jnp.asarray(0, dtype=integer)
+    data_rate_error = jnp.asarray(0, dtype=integer)
 
     for count in range(x_train_indices_a.size, max_search_number):
         input_train_data_a: Array = coordinate.convert_indices_to_transmitter_positions(
@@ -256,7 +256,7 @@ def double_transmitter_bayesian_optimization(
                         input_x_test_data_b.ravel(),
                         input_y_test_data_b.ravel(),
                     ],
-                    dtype=constant.floating,
+                    dtype=floating,
                 ),
                 output_shape=x_transmitter_positions.shape,
             )
@@ -270,7 +270,7 @@ def double_transmitter_bayesian_optimization(
                 indices=jnp.argmax(acquisition),
                 shape=acquisition.shape,
             )
-            return jnp.asarray(next_index, dtype=constant.integer), acquisition.max()
+            return jnp.asarray(next_index, dtype=integer), acquisition.max()
 
         next_index, max_acquisition = jax.vmap(body_fun)(jnp.arange(0, search_number))
         max_index: tuple[Array, ...] = jnp.unravel_index(
@@ -297,7 +297,7 @@ def double_transmitter_bayesian_optimization(
                             x_train_indices_b,
                             y_train_indices_b,
                         ],
-                        dtype=constant.integer,
+                        dtype=integer,
                     ),
                 ),
                 axis=0,
@@ -419,11 +419,11 @@ def triple_transmitter_bayesian_optimization(
     )
 
     count = 0
-    min_distance = jnp.asarray(0, dtype=constant.integer)
-    min_distance_a = jnp.asarray(0, dtype=constant.integer)
-    min_distance_b = jnp.asarray(0, dtype=constant.integer)
-    min_distance_c = jnp.asarray(0, dtype=constant.integer)
-    data_rate_error = jnp.asarray(0, dtype=constant.integer)
+    min_distance = jnp.asarray(0, dtype=integer)
+    min_distance_a = jnp.asarray(0, dtype=integer)
+    min_distance_b = jnp.asarray(0, dtype=integer)
+    min_distance_c = jnp.asarray(0, dtype=integer)
+    data_rate_error = jnp.asarray(0, dtype=integer)
 
     for count in range(x_train_indices_a.size, max_search_number):
         input_train_data_a: Array = coordinate.convert_indices_to_transmitter_positions(
@@ -505,7 +505,7 @@ def triple_transmitter_bayesian_optimization(
                             input_x_test_data_c.ravel(),
                             input_y_test_data_c.ravel(),
                         ],
-                        dtype=constant.floating,
+                        dtype=floating,
                     ),
                     output_shape=x_transmitter_positions.shape,
                 )
@@ -519,9 +519,7 @@ def triple_transmitter_bayesian_optimization(
                     indices=jnp.argmax(acquisition),
                     shape=acquisition.shape,
                 )
-                return jnp.asarray(
-                    next_index, dtype=constant.integer
-                ), acquisition.max()
+                return jnp.asarray(next_index, dtype=integer), acquisition.max()
 
             next_index, max_each_acquisition = jax.vmap(body_fun2)(
                 jnp.arange(0, search_number)
@@ -566,13 +564,13 @@ def triple_transmitter_bayesian_optimization(
             search_number,
             body_fun1,
             (
-                jnp.asarray(0.0, dtype=constant.floating),
-                jnp.asarray(0, dtype=constant.integer),
-                jnp.asarray(0, dtype=constant.integer),
-                jnp.asarray(0, dtype=constant.integer),
-                jnp.asarray(0, dtype=constant.integer),
-                jnp.asarray(0, dtype=constant.integer),
-                jnp.asarray(0, dtype=constant.integer),
+                jnp.asarray(0.0, dtype=floating),
+                jnp.asarray(0, dtype=integer),
+                jnp.asarray(0, dtype=integer),
+                jnp.asarray(0, dtype=integer),
+                jnp.asarray(0, dtype=integer),
+                jnp.asarray(0, dtype=integer),
+                jnp.asarray(0, dtype=integer),
             ),
         )
 
@@ -595,7 +593,7 @@ def triple_transmitter_bayesian_optimization(
                             x_train_indices_c,
                             y_train_indices_c,
                         ],
-                        dtype=constant.integer,
+                        dtype=integer,
                     )
                 ),
                 axis=0,

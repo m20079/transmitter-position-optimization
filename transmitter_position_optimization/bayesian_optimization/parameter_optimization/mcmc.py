@@ -1,13 +1,13 @@
 from functools import partial
-from typing import Any, Self
+from typing import Any, Callable, Self
 
-import constant
 import jax
 import jax.numpy as jnp
 from bayesian_optimization.kernel.kernel import Kernel
 from bayesian_optimization.parameter_optimization.parameter_optimization import (
     ParameterOptimization,
 )
+from constant import floating, integer
 from jax import Array, random
 
 
@@ -15,20 +15,21 @@ from jax import Array, random
 class MCMC(ParameterOptimization):
     def __init__(
         self: Self,
-        std_params: Array,
+        std_params: Callable[[Array], Array],
         count: int,
         seed: int,
         parameter_optimization: ParameterOptimization,
     ) -> None:
-        self.std_params: Array = std_params
+        self.std_params: Callable[[Array], Array] = std_params
         self.count: int = count
         self.seed: int = seed
         self.parameter_optimization: ParameterOptimization = parameter_optimization
 
-    def tree_flatten(self: Self) -> tuple[tuple[Array], dict[str, Any]]:
+    def tree_flatten(self: Self) -> tuple[tuple[()], dict[str, Any]]:
         return (
-            (self.std_params,),
+            (),
             {
+                "std_params": self.std_params,
                 "count": self.count,
                 "seed": self.seed,
                 "parameter_optimization": self.parameter_optimization,
@@ -46,8 +47,8 @@ class MCMC(ParameterOptimization):
         output_train_data: Array,
         kernel: Kernel,
     ) -> Array:
-        min: Array = jnp.finfo(constant.floating).tiny.astype(constant.floating)
-        max: Array = jnp.finfo(constant.floating).max.astype(constant.floating)
+        min: Array = jnp.finfo(floating).tiny.astype(floating)
+        max: Array = jnp.finfo(floating).max.astype(floating)
 
         init_parameter: Array = self.parameter_optimization.optimize(
             input_train_data=input_train_data,
@@ -55,14 +56,16 @@ class MCMC(ParameterOptimization):
             kernel=kernel,
         )
 
-        keys: Array = random.split(random.key(self.seed), self.std_params.size)
+        std_params: Array = self.std_params(init_parameter)
+
+        keys: Array = random.split(random.key(self.seed), std_params.size)
         parameter: Array = jax.vmap(
             lambda key, std_param: std_param
             * random.normal(
                 key,
                 (self.count,),
             )
-        )(keys, self.std_params)
+        )(keys, std_params)
 
         @jax.jit
         def body_fun(
@@ -123,11 +126,11 @@ class MCMC(ParameterOptimization):
             )
 
         init_val: tuple[Array, Array, Array, Array, Array] = (
-            jnp.asarray(0, dtype=constant.integer),
+            jnp.asarray(0, dtype=integer),
             init_parameter,
-            jnp.asarray(-jnp.inf, dtype=constant.floating),
+            jnp.asarray(-jnp.inf, dtype=floating),
             init_parameter,
-            jnp.asarray(-jnp.inf, dtype=constant.floating),
+            jnp.asarray(-jnp.inf, dtype=floating),
         )
         (_, _, _, max_parameter, _), _ = jax.lax.scan(body_fun, init_val, parameter.T)
         return max_parameter

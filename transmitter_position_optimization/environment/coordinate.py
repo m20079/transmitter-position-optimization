@@ -1,7 +1,6 @@
 from functools import partial
 from typing import Any, Self
 
-import constant
 import jax
 import jax.numpy as jnp
 from constant import floating, integer
@@ -74,7 +73,7 @@ class Coordinate:
                 x_positions * float(self.x_mesh) / self.x_size,
                 y_positions * float(self.y_mesh) / self.y_size,
             ]
-        ).astype(constant.integer)
+        ).astype(integer)
 
     @jax.jit
     def convert_receiver_positions_to_indices(
@@ -87,7 +86,7 @@ class Coordinate:
                 x_positions * float(self.x_mesh) / self.x_size - 0.5,
                 y_positions * float(self.y_mesh) / self.y_size - 0.5,
             ]
-        ).astype(constant.integer)
+        ).astype(integer)
 
     @partial(jax.jit, static_argnums=(2,))
     def create_random_receiver_positions(
@@ -145,7 +144,7 @@ class Coordinate:
                 x_positions,
                 y_positions,
             ),
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -173,7 +172,7 @@ class Coordinate:
                 x_positions,
                 y_positions,
             ),
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @partial(jax.jit, static_argnums=(2,))
@@ -200,7 +199,7 @@ class Coordinate:
                     dtype=integer,
                 ),
             ],
-            dtype=constant.integer,
+            dtype=integer,
         )
 
     @partial(jax.jit, static_argnums=(1,))
@@ -212,9 +211,7 @@ class Coordinate:
         y_grid_size: int = self.y_mesh // (number * 2)
         x_grid: Array = jnp.arange(1, number * 2, 2) * x_grid_size
         y_grid: Array = jnp.arange(1, number * 2, 2) * y_grid_size
-        return jnp.asarray(
-            jnp.meshgrid(x_grid, y_grid), dtype=constant.integer
-        ).reshape(2, -1)
+        return jnp.asarray(jnp.meshgrid(x_grid, y_grid), dtype=integer).reshape(2, -1)
 
     @partial(jax.jit, static_argnums=(2,))
     def create_random_transmitter_positions(

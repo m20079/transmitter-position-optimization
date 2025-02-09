@@ -8,7 +8,7 @@ from jax import Array
 
 @jax.tree_util.register_pytree_node_class
 class Kernel(metaclass=ABCMeta):
-    def tree_flatten(self: Self) -> tuple[tuple[()], dict]:
+    def tree_flatten(self: Self) -> tuple[tuple, dict]:
         return (
             (),
             {},

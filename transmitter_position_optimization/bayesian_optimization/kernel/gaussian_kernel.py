@@ -1,9 +1,9 @@
 from typing import Self
 
-import constant
 import jax
 import jax.numpy as jnp
 from bayesian_optimization.kernel.kernel import Kernel
+from constant import floating
 from jax import Array
 
 
@@ -27,7 +27,7 @@ class GaussianKernel(Kernel):
                 [0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -38,7 +38,7 @@ class GaussianKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -80,7 +80,7 @@ class GaussianKernel(Kernel):
                     self.del_k_del_parameter2(input1, input2, parameter),
                 ),
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -174,7 +174,7 @@ class GaussianKernel(Kernel):
                     ),
                 ],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -281,7 +281,7 @@ class GaussianTwoDimKernel(Kernel):
                 [0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -292,7 +292,7 @@ class GaussianTwoDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -344,7 +344,7 @@ class GaussianTwoDimKernel(Kernel):
                     self.del_k_del_parameter2(input1, input2, parameter),
                 ),
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -420,7 +420,7 @@ class GaussianPolynomialTwoDimKernel(Kernel):
                 [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -431,7 +431,7 @@ class GaussianPolynomialTwoDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -505,7 +505,7 @@ class GaussianPlusGaussianFourDimKernel(Kernel):
                 [0.0, 0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -516,7 +516,7 @@ class GaussianPlusGaussianFourDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -595,7 +595,7 @@ class GaussianTimesGaussianFourDimKernel(Kernel):
                 [0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -606,7 +606,7 @@ class GaussianTimesGaussianFourDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -686,7 +686,7 @@ class GaussianPlusGaussianPlusGaussianSixDimKernel(Kernel):
                 [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -697,7 +697,7 @@ class GaussianPlusGaussianPlusGaussianSixDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -788,7 +788,7 @@ class GaussianTimesGaussianTimesGaussianSixDimKernel(Kernel):
                 [0.0, 0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -799,7 +799,7 @@ class GaussianTimesGaussianTimesGaussianSixDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit

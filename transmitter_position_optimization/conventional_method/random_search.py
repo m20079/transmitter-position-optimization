@@ -1,5 +1,5 @@
-import constant
 import jax.numpy as jnp
+from constant import integer
 from environment.coordinate import Coordinate
 from environment.data_rate import DataRate
 from environment.distance import get_distance
@@ -28,8 +28,8 @@ def single_transmitter_random_search(
         init_y_position=init_y_position,
     )
     transmitter_function: JitWrapped = data_rate.create_single_transmitter_function()
-    min_distance = jnp.asarray(0, dtype=constant.integer)
-    data_rate_error = jnp.asarray(0, dtype=constant.integer)
+    min_distance = jnp.asarray(0, dtype=integer)
+    data_rate_error = jnp.asarray(0, dtype=integer)
     x_indices, y_indices = coordinate.create_random_transmitter_indices(
         seed=seed,
         number=number,
@@ -97,10 +97,10 @@ def double_transmitter_random_search(
         init_y_position=init_y_position,
     )
     transmitter_function: JitWrapped = data_rate.create_double_transmitter_function()
-    min_distance = jnp.asarray(0, dtype=constant.integer)
-    min_distance_a = jnp.asarray(0, dtype=constant.integer)
-    min_distance_b = jnp.asarray(0, dtype=constant.integer)
-    data_rate_error = jnp.asarray(0, dtype=constant.integer)
+    min_distance = jnp.asarray(0, dtype=integer)
+    min_distance_a = jnp.asarray(0, dtype=integer)
+    min_distance_b = jnp.asarray(0, dtype=integer)
+    data_rate_error = jnp.asarray(0, dtype=integer)
     x_indices_a, y_indices_a = coordinate.create_random_transmitter_indices(
         seed=seed,
         number=number,
@@ -212,11 +212,11 @@ def triple_transmitter_random_search(
         init_y_position=init_y_position,
     )
     transmitter_function: JitWrapped = data_rate.create_triple_transmitter_function()
-    min_distance = jnp.asarray(0, dtype=constant.integer)
-    min_distance_a = jnp.asarray(0, dtype=constant.integer)
-    min_distance_b = jnp.asarray(0, dtype=constant.integer)
-    min_distance_c = jnp.asarray(0, dtype=constant.integer)
-    data_rate_error = jnp.asarray(0, dtype=constant.integer)
+    min_distance = jnp.asarray(0, dtype=integer)
+    min_distance_a = jnp.asarray(0, dtype=integer)
+    min_distance_b = jnp.asarray(0, dtype=integer)
+    min_distance_c = jnp.asarray(0, dtype=integer)
+    data_rate_error = jnp.asarray(0, dtype=integer)
     x_indices_a, y_indices_a = coordinate.create_random_transmitter_indices(
         seed=seed,
         number=number,

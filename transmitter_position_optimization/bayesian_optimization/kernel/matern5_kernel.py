@@ -1,9 +1,9 @@
 from typing import Self
 
-import constant
 import jax
 import jax.numpy as jnp
 from bayesian_optimization.kernel.kernel import Kernel
+from constant import floating
 from jax import Array
 
 
@@ -27,7 +27,7 @@ class Matern5Kernel(Kernel):
                 [0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -38,7 +38,7 @@ class Matern5Kernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -103,7 +103,7 @@ class Matern5TwoDimKernel(Kernel):
                 [0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -114,7 +114,7 @@ class Matern5TwoDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -186,7 +186,7 @@ class Matern5PolynomialTwoDimKernel(Kernel):
                 [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -197,7 +197,7 @@ class Matern5PolynomialTwoDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -273,7 +273,7 @@ class Matern5PlusMatern5FourDimKernel(Kernel):
                 [0.0, 0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -284,7 +284,7 @@ class Matern5PlusMatern5FourDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -361,7 +361,7 @@ class Matern5TimesMatern5FourDimKernel(Kernel):
                 [0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -372,7 +372,7 @@ class Matern5TimesMatern5FourDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -450,7 +450,7 @@ class Matern5PlusMatern5PlusMatern5SixDimKernel(Kernel):
                 [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -461,7 +461,7 @@ class Matern5PlusMatern5PlusMatern5SixDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -550,7 +550,7 @@ class Matern5TimesMatern5TimesMatern5SixDimKernel(Kernel):
                 [0.0, 0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -561,7 +561,7 @@ class Matern5TimesMatern5TimesMatern5SixDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit

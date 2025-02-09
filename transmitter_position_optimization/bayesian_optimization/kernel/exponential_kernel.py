@@ -1,9 +1,9 @@
 from typing import Self
 
-import constant
 import jax
 import jax.numpy as jnp
 from bayesian_optimization.kernel.kernel import Kernel
+from constant import floating
 from jax import Array
 
 
@@ -27,7 +27,7 @@ class ExponentialKernel(Kernel):
                 [0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -38,7 +38,7 @@ class ExponentialKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -80,7 +80,7 @@ class ExponentialKernel(Kernel):
                     self.del_k_del_parameter2(input1, input2, parameter),
                 ),
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -144,7 +144,7 @@ class ExponentialTwoDimKernel(Kernel):
                 [0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -155,7 +155,7 @@ class ExponentialTwoDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -207,7 +207,7 @@ class ExponentialTwoDimKernel(Kernel):
                     self.del_k_del_parameter2(input1, input2, parameter),
                 ),
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -293,7 +293,7 @@ class ExponentialPolynomialTwoDimKernel(Kernel):
                 [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -304,7 +304,7 @@ class ExponentialPolynomialTwoDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -380,7 +380,7 @@ class ExponentialPlusExponentialFourDimKernel(Kernel):
                 [0.0, 0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -391,7 +391,7 @@ class ExponentialPlusExponentialFourDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -476,7 +476,7 @@ class ExponentialTimesExponentialFourDimKernel(Kernel):
                 [0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -487,7 +487,7 @@ class ExponentialTimesExponentialFourDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -571,7 +571,7 @@ class ExponentialPlusExponentialPlusExponentialSixDimKernel(Kernel):
                 [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -582,7 +582,7 @@ class ExponentialPlusExponentialPlusExponentialSixDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -679,7 +679,7 @@ class ExponentialTimesExponentialTimesExponentialSixDimKernel(Kernel):
                 [0.0, 0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -690,7 +690,7 @@ class ExponentialTimesExponentialTimesExponentialSixDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit

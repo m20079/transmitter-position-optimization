@@ -1,9 +1,9 @@
 from typing import Self
 
-import constant
 import jax
 import jax.numpy as jnp
 from bayesian_optimization.kernel.kernel import Kernel
+from constant import floating
 from jax import Array
 
 
@@ -27,7 +27,7 @@ class RationalQuadraticKernel(Kernel):
                 [0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -38,7 +38,7 @@ class RationalQuadraticKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -103,7 +103,7 @@ class RationalQuadraticTwoDimKernel(Kernel):
                 [0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -114,7 +114,7 @@ class RationalQuadraticTwoDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -188,7 +188,7 @@ class RationalQuadraticPolynomialTwoDimKernel(Kernel):
                 [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -199,7 +199,7 @@ class RationalQuadraticPolynomialTwoDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -274,7 +274,7 @@ class RationalQuadraticPlusRationalQuadraticFourDimKernel(Kernel):
                 [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -285,7 +285,7 @@ class RationalQuadraticPlusRationalQuadraticFourDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -364,7 +364,7 @@ class RationalQuadraticTimesRationalQuadraticFourDimKernel(Kernel):
                 [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -375,7 +375,7 @@ class RationalQuadraticTimesRationalQuadraticFourDimKernel(Kernel):
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -453,7 +453,7 @@ class RationalQuadraticPlusRationalQuadraticPlusRationalQuadraticSixDimKernel(Ke
                 [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -486,7 +486,7 @@ class RationalQuadraticPlusRationalQuadraticPlusRationalQuadraticSixDimKernel(Ke
                     1.0e-1,
                 ],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit
@@ -575,7 +575,7 @@ class RationalQuadraticTimesRationalQuadraticTimesRationalQuadraticSixDimKernel(
                 [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @staticmethod
@@ -586,7 +586,7 @@ class RationalQuadraticTimesRationalQuadraticTimesRationalQuadraticSixDimKernel(
                 [1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-2, 1.0e-7],
                 [1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e4, 1.0e-1],
             ],
-            dtype=constant.floating,
+            dtype=floating,
         )
 
     @jax.jit

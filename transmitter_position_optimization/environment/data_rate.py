@@ -1,7 +1,6 @@
 from functools import partial
 from typing import Self
 
-import constant
 import jax
 import jax.numpy as jnp
 from constant import (
@@ -83,7 +82,7 @@ class DataRate:
             shape=value.shape,
         )
         return jnp.asarray(
-            [true_value_indices[1], true_value_indices[0]], dtype=constant.integer
+            [true_value_indices[1], true_value_indices[0]], dtype=integer
         )
 
     @partial(jax.jit, static_argnums=(1,))
@@ -147,7 +146,7 @@ class DataRate:
                     true_value_x_indices_j,
                     true_value_y_indices_j,
                 ],
-                dtype=constant.integer,
+                dtype=integer,
             ).T
 
         return jax.vmap(arrange_indices)(
@@ -273,7 +272,7 @@ class DataRate:
                     true_value_x_indices_k,
                     true_value_y_indices_k,
                 ],
-                dtype=constant.integer,
+                dtype=integer,
             ).T
 
         return jax.vmap(arrange_indices)(
