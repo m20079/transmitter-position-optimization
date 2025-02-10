@@ -7,9 +7,9 @@ def save_result(
     distance_error: list[float],
     data_rate_absolute_error: list[float],
     data_rate_relative_error: list[float],
-    each_distance_error_a: list[float] | None = None,
-    each_distance_error_b: list[float] | None = None,
-    each_distance_error_c: list[float] | None = None,
+    distance_error_a: list[float] | None = None,
+    distance_error_b: list[float] | None = None,
+    distance_error_c: list[float] | None = None,
 ):
     jnp.savez(
         f"{debug_name}.npz",
@@ -17,7 +17,7 @@ def save_result(
         distance_error=distance_error,
         data_rate_absolute_error=data_rate_absolute_error,
         data_rate_relative_error=data_rate_relative_error,
-        each_distance_error_a=each_distance_error_a or jnp.array([]),
-        each_distance_error_b=each_distance_error_b or jnp.array([]),
-        each_distance_error_c=each_distance_error_c or jnp.array([]),
+        distance_error_a=distance_error_a or jnp.array([]),
+        distance_error_b=distance_error_b or jnp.array([]),
+        distance_error_c=distance_error_c or jnp.array([]),
     )

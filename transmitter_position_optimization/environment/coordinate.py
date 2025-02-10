@@ -1,3 +1,4 @@
+import itertools
 from functools import partial
 from typing import Any, Self
 
@@ -203,7 +204,7 @@ class Coordinate:
         )
 
     @partial(jax.jit, static_argnums=(1,))
-    def create_grid_transmitter_indices(
+    def create_grid_single_transmitter_indices(
         self: Self,
         number: int,
     ) -> Array:
@@ -211,7 +212,31 @@ class Coordinate:
         y_grid_size: int = self.y_mesh // (number * 2)
         x_grid: Array = jnp.arange(1, number * 2, 2) * x_grid_size
         y_grid: Array = jnp.arange(1, number * 2, 2) * y_grid_size
-        return jnp.asarray(jnp.meshgrid(x_grid, y_grid), dtype=integer).reshape(2, -1)
+        return jnp.asarray(list(itertools.product(x_grid, y_grid))).T
+
+    @partial(jax.jit, static_argnums=(1,))
+    def create_grid_double_transmitter_indices(
+        self: Self,
+        number: int,
+    ) -> Array:
+        x_grid_size: int = self.x_mesh // (number * 2)
+        y_grid_size: int = self.y_mesh // (number * 2)
+        x_grid: Array = jnp.arange(1, number * 2, 2) * x_grid_size
+        y_grid: Array = jnp.arange(1, number * 2, 2) * y_grid_size
+        return jnp.asarray(list(itertools.product(x_grid, y_grid, x_grid, y_grid))).T
+
+    @partial(jax.jit, static_argnums=(1,))
+    def create_grid_triple_transmitter_indices(
+        self: Self,
+        number: int,
+    ) -> Array:
+        x_grid_size: int = self.x_mesh // (number * 2)
+        y_grid_size: int = self.y_mesh // (number * 2)
+        x_grid: Array = jnp.arange(1, number * 2, 2) * x_grid_size
+        y_grid: Array = jnp.arange(1, number * 2, 2) * y_grid_size
+        return jnp.asarray(
+            list(itertools.product(x_grid, y_grid, x_grid, y_grid, x_grid, y_grid))
+        ).T
 
     @partial(jax.jit, static_argnums=(2,))
     def create_random_transmitter_positions(

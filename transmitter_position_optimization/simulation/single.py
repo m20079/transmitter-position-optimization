@@ -1,16 +1,12 @@
 from typing import Literal
+
 import jax.numpy as jnp
+from bayesian_optimization.bayesian_optimization import (
+    single_transmitter_bayesian_optimization,
+)
 from bayesian_optimization.kernel.kernel import Kernel
 from bayesian_optimization.parameter_optimization.parameter_optimization import (
     ParameterOptimization,
-)
-from environment.coordinate import Coordinate
-from environment.propagation import Propagation
-from jax import Array, random
-from jax._src.pjit import JitWrapped
-
-from bayesian_optimization.bayesian_optimization import (
-    single_transmitter_bayesian_optimization,
 )
 from conventional_method.distance_estimation import (
     single_transmitter_distance_estimation,
@@ -18,6 +14,10 @@ from conventional_method.distance_estimation import (
 from conventional_method.random_search import (
     single_transmitter_random_search,
 )
+from environment.coordinate import Coordinate
+from environment.propagation import Propagation
+from jax import Array, random
+from jax._src.pjit import JitWrapped
 from print import print_result
 from save import save_result
 
@@ -55,7 +55,7 @@ def single_transmitter_bo_simulation(
                 key=train_indices_key,
                 number=init_train_indices_random_number,
             ),
-            coordinate.create_grid_transmitter_indices(
+            coordinate.create_grid_single_transmitter_indices(
                 number=init_train_indices_grid_number,
             ),
         )
@@ -151,8 +151,14 @@ def single_transmitter_de_simulation(
         )
         print(f"count: {result[0]}", flush=True)
         print(f"distance_error: {float(result[1].block_until_ready())}", flush=True)
-        print(f"data_rate_absolute_error: {float(result[2].block_until_ready())}", flush=True)
-        print(f"data_rate_relative_error: {float(result[3].block_until_ready())}", flush=True)
+        print(
+            f"data_rate_absolute_error: {float(result[2].block_until_ready())}",
+            flush=True,
+        )
+        print(
+            f"data_rate_relative_error: {float(result[3].block_until_ready())}",
+            flush=True,
+        )
 
     print_result(
         debug_name=debug_name,
@@ -218,8 +224,14 @@ def single_transmitter_rs_simulation(
         )
         print(f"count: {result[0]}", flush=True)
         print(f"distance_error: {float(result[1].block_until_ready())}", flush=True)
-        print(f"data_rate_absolute_error: {float(result[2].block_until_ready())}", flush=True)
-        print(f"data_rate_relative_error: {float(result[3].block_until_ready())}", flush=True)
+        print(
+            f"data_rate_absolute_error: {float(result[2].block_until_ready())}",
+            flush=True,
+        )
+        print(
+            f"data_rate_relative_error: {float(result[3].block_until_ready())}",
+            flush=True,
+        )
 
     print_result(
         debug_name=debug_name,

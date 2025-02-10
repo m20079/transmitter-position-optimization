@@ -7,9 +7,9 @@ def print_result(
     distance_error: list[float],
     data_rate_absolute_error: list[float],
     data_rate_relative_error: list[float],
-    each_distance_error_a: list[float] | None = None,
-    each_distance_error_b: list[float] | None = None,
-    each_distance_error_c: list[float] | None = None,
+    distance_error_a: list[float] | None = None,
+    distance_error_b: list[float] | None = None,
+    distance_error_c: list[float] | None = None,
 ) -> None:
     with open(f"{debug_name}.txt", "w") as o:
         print(f"Count: {count}", flush=True, file=o)
@@ -21,12 +21,12 @@ def print_result(
             f"Data Rate relative error: {data_rate_relative_error}", flush=True, file=o
         )
 
-        if each_distance_error_a is not None:
-            print(f"Distance error A: {each_distance_error_a}", flush=True, file=o)
-        if each_distance_error_b is not None:
-            print(f"Distance error B: {each_distance_error_b}", flush=True, file=o)
-        if each_distance_error_c is not None:
-            print(f"Distance error C: {each_distance_error_c}", flush=True, file=o)
+        if distance_error_a is not None:
+            print(f"Distance error A: {distance_error_a}", flush=True, file=o)
+        if distance_error_b is not None:
+            print(f"Distance error B: {distance_error_b}", flush=True, file=o)
+        if distance_error_c is not None:
+            print(f"Distance error C: {distance_error_c}", flush=True, file=o)
 
         rounded_distance_error: list[float] = [round(c, 4) for c in distance_error]
         result_distance: dict[float, list[int]] = {}
