@@ -7,6 +7,7 @@ from bayesian_optimization.kernel.kernel import Kernel
 from bayesian_optimization.parameter_optimization.parameter_optimization import (
     ParameterOptimization,
 )
+from constant import max_log_likelihood
 from jax import Array, random
 
 
@@ -75,7 +76,9 @@ class LogRandomSearch(ParameterOptimization):
                 output_train_data=output_train_data,
             )
             return jnp.where(
-                jnp.logical_and(likelihood < 0.0, likelihood != jnp.nan),
+                jnp.logical_and(
+                    likelihood <= max_log_likelihood, likelihood != jnp.nan
+                ),
                 likelihood,
                 -jnp.inf,
             )

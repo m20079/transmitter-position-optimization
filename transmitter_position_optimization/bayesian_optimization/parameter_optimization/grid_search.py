@@ -56,6 +56,12 @@ class GridSearch(ParameterOptimization):
                 k_inv=k_inv,
                 output_train_data=output_train_data,
             )
-            return jnp.where(likelihood < max_log_likelihood, likelihood, -jnp.inf)
+            return jnp.where(
+                jnp.logical_and(
+                    likelihood <= max_log_likelihood, likelihood != jnp.nan
+                ),
+                likelihood,
+                -jnp.inf,
+            )
 
         return parameter.T[jnp.argmax(jax.vmap(body_fn)(parameter.T))]

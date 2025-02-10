@@ -7,7 +7,7 @@ from bayesian_optimization.kernel.kernel import Kernel
 from bayesian_optimization.parameter_optimization.parameter_optimization import (
     ParameterOptimization,
 )
-from constant import floating, integer
+from constant import floating, integer, max_log_likelihood
 from jax import Array, random
 
 
@@ -109,14 +109,20 @@ class MCMC(ParameterOptimization):
                     ),
                     jnp.where(
                         jnp.logical_and(
-                            likelihood > max_likelihood, likelihood < jnp.asarray(0.0)
+                            likelihood > max_likelihood,
+                            jnp.logical_and(
+                                likelihood <= max_log_likelihood, likelihood != jnp.nan
+                            ),
                         ),
                         new_parameter,
                         max_parameter,
                     ),
                     jnp.where(
                         jnp.logical_and(
-                            likelihood > max_likelihood, likelihood < jnp.asarray(0.0)
+                            likelihood > max_likelihood,
+                            jnp.logical_and(
+                                likelihood <= max_log_likelihood, likelihood != jnp.nan
+                            ),
                         ),
                         likelihood,
                         max_likelihood,
