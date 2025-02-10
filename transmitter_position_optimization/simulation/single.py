@@ -6,20 +6,20 @@ from bayesian_optimization.parameter_optimization.parameter_optimization import 
 )
 from environment.coordinate import Coordinate
 from environment.propagation import Propagation
-from jax import random
+from jax import Array, random
 from jax._src.pjit import JitWrapped
 
-from transmitter_position_optimization.bayesian_optimization.bayesian_optimization import (
+from bayesian_optimization.bayesian_optimization import (
     single_transmitter_bayesian_optimization,
 )
-from transmitter_position_optimization.conventional_method.distance_estimation import (
+from conventional_method.distance_estimation import (
     single_transmitter_distance_estimation,
 )
-from transmitter_position_optimization.conventional_method.random_search import (
+from conventional_method.random_search import (
     single_transmitter_random_search,
 )
-from transmitter_position_optimization.print import print_result
-from transmitter_position_optimization.save import save_result
+from print import print_result
+from save import save_result
 
 
 def single_transmitter_bo_simulation(
@@ -127,7 +127,7 @@ def single_transmitter_de_simulation(
     for seed in range(simulation_number):
         receivers_key, shadowing_key = random.split(key=random.key(seed=seed), num=2)
 
-        result: tuple[int, float, float, float] = (
+        result: tuple[int, Array, Array, Array] = (
             single_transmitter_distance_estimation(
                 propagation=propagation,
                 coordinate=coordinate,
@@ -141,18 +141,18 @@ def single_transmitter_de_simulation(
         )
 
         count.append(result[0])
-        distance_error.append(result[1])
-        data_rate_absolute_error.append(result[2])
-        data_rate_relative_error.append(result[3])
+        distance_error.append(float(result[1].block_until_ready()))
+        data_rate_absolute_error.append(float(result[2].block_until_ready()))
+        data_rate_relative_error.append(float(result[3].block_until_ready()))
 
         print(
             f"simulation {debug_name}: {seed + 1}",
             flush=True,
         )
         print(f"count: {result[0]}", flush=True)
-        print(f"distance_error: {result[1]}", flush=True)
-        print(f"data_rate_absolute_error: {result[2]}", flush=True)
-        print(f"data_rate_relative_error: {result[3]}", flush=True)
+        print(f"distance_error: {float(result[1].block_until_ready())}", flush=True)
+        print(f"data_rate_absolute_error: {float(result[2].block_until_ready())}", flush=True)
+        print(f"data_rate_relative_error: {float(result[3].block_until_ready())}", flush=True)
 
     print_result(
         debug_name=debug_name,
@@ -194,7 +194,7 @@ def single_transmitter_rs_simulation(
             key=random.key(seed=seed), num=3
         )
 
-        result: tuple[int, float, float, float] = single_transmitter_random_search(
+        result: tuple[int, Array, Array, Array] = single_transmitter_random_search(
             propagation=propagation,
             coordinate=coordinate,
             receivers_key=receivers_key,
@@ -208,18 +208,18 @@ def single_transmitter_rs_simulation(
         )
 
         count.append(result[0])
-        distance_error.append(result[1])
-        data_rate_absolute_error.append(result[2])
-        data_rate_relative_error.append(result[3])
+        distance_error.append(float(result[1].block_until_ready()))
+        data_rate_absolute_error.append(float(result[2].block_until_ready()))
+        data_rate_relative_error.append(float(result[3].block_until_ready()))
 
         print(
             f"simulation {debug_name}: {seed + 1}",
             flush=True,
         )
         print(f"count: {result[0]}", flush=True)
-        print(f"distance_error: {result[1]}", flush=True)
-        print(f"data_rate_absolute_error: {result[2]}", flush=True)
-        print(f"data_rate_relative_error: {result[3]}", flush=True)
+        print(f"distance_error: {float(result[1].block_until_ready())}", flush=True)
+        print(f"data_rate_absolute_error: {float(result[2].block_until_ready())}", flush=True)
+        print(f"data_rate_relative_error: {float(result[3].block_until_ready())}", flush=True)
 
     print_result(
         debug_name=debug_name,

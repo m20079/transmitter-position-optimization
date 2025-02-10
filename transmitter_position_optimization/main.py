@@ -40,7 +40,7 @@ from simulation.single import (
 
 if __name__ == "__main__":
     jax.config.update("jax_numpy_dtype_promotion", "strict")
-    jax.config.update("jax_platforms", "cpu")
+    # jax.config.update("jax_platforms", "cpu")
     jax.config.update(
         "jax_enable_x64",
         integer == jnp.int64 and floating == jnp.float64,
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     bandwidth: float = 1.0e6
     simulation_number: int = 1000
     acquisition_function: JitWrapped = Acquisition.ucb()
-    evaluation_function: JitWrapped = Evaluation.min()
+    evaluation_function: JitWrapped = Evaluation.min
     init_train_indices_type: str = "random"
 
     single_transmitter_rs_simulation(

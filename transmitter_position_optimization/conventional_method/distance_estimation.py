@@ -22,7 +22,7 @@ def single_transmitter_distance_estimation(
     noise_floor: float,
     bandwidth: float,
     evaluation_function: JitWrapped,
-) -> tuple[int, float, float, float]:
+) -> tuple[int, Array, Array, Array]:
     data_rate: DataRate = propagation.create_data_rate(
         coordinate=coordinate,
         receivers_key=receivers_key,
@@ -82,9 +82,9 @@ def single_transmitter_distance_estimation(
     data_rate_relative_error: Array = data_rate_absolute_error / true_data_rate.max()
     return (
         1,
-        float(min_distance),
-        float(data_rate_absolute_error),
-        float(data_rate_relative_error),
+        min_distance,
+        data_rate_absolute_error,
+        data_rate_relative_error,
     )
 
 
