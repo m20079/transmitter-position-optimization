@@ -12,25 +12,33 @@ from jax import Array
 from jax._src.pjit import JitWrapped
 
 
-@partial(jax.jit, static_argnums=(0, 1, 2, 3, 4, 5, 6))
-def single_transmitter_distance(
+@partial(jax.jit, static_argnums=(0, 1, 4, 5, 6, 7))
+def single_transmitter_distance_estimation(
     propagation: Propagation,
     coordinate: Coordinate,
-    receivers: Receivers,
-    frequency: float,
-    init_x_position: float,
-    init_y_position: float,
+    receivers_key: Array,
+    shadowing_key: Array,
+    receiver_number: int,
+    noise_floor: float,
+    bandwidth: float,
     evaluation_function: JitWrapped,
-) -> tuple[int, float, float]:
+) -> tuple[int, float, float, float]:
     data_rate: DataRate = propagation.create_data_rate(
         coordinate=coordinate,
-        receivers=receivers,
-        frequency=frequency,
-        init_x_position=init_x_position,
-        init_y_position=init_y_position,
+        receivers_key=receivers_key,
+        shadowing_key=shadowing_key,
+        receiver_number=receiver_number,
+        noise_floor=noise_floor,
+        bandwidth=bandwidth,
     )
     transmitter_function: JitWrapped = data_rate.create_single_transmitter_function()
 
+    receivers: Receivers = coordinate.create_random_position_receivers(
+        key=receivers_key,
+        number=receiver_number,
+        noise_floor=noise_floor,
+        bandwidth=bandwidth,
+    )
     estimate_x_position: Array = jnp.average(receivers.x_positions)
     estimate_y_position: Array = jnp.average(receivers.y_positions)
 
@@ -40,13 +48,11 @@ def single_transmitter_distance(
             y_positions=estimate_y_position,
         )
     )
-    estimate_data_rate: Array = transmitter_function(
-        x_indices=estimate_x_index,
-        y_indices=estimate_y_index,
-    )
     estimate_value: Array = evaluation_function(
-        data_rate=estimate_data_rate,
-        axis=0,
+        data_rate=transmitter_function(
+            x_indices=estimate_x_index,
+            y_indices=estimate_y_index,
+        )
     )
 
     true_x_indices, true_y_indices = data_rate.get_true_single_transmitter_indices(
@@ -66,19 +72,19 @@ def single_transmitter_distance(
     )
     min_distance: Array = each_distances.min()
 
-    each_true_data_rate: Array = transmitter_function(
-        x_indices=true_x_indices,
-        y_indices=true_y_indices,
+    true_data_rate: Array = evaluation_function(
+        data_rate=transmitter_function(
+            x_indices=true_x_indices,
+            y_indices=true_y_indices,
+        )
     )
-    true_value: Array = evaluation_function(
-        data_rate=each_true_data_rate,
-    )
-    data_rate_error: Array = true_value - estimate_value
-
+    data_rate_absolute_error: Array = true_data_rate.max() - estimate_value.max()
+    data_rate_relative_error: Array = data_rate_absolute_error / true_data_rate.max()
     return (
         1,
         float(min_distance),
-        float(data_rate_error),
+        float(data_rate_absolute_error),
+        float(data_rate_relative_error),
     )
 
 

@@ -1,3 +1,4 @@
+from functools import partial
 import jax.numpy as jnp
 from constant import integer
 from environment.coordinate import Coordinate
@@ -7,74 +8,82 @@ from environment.propagation import Propagation
 from environment.receivers import Receivers
 from jax import Array
 from jax._src.pjit import JitWrapped
+import jax
 
 
+@partial(jax.jit, static_argnums=(0, 1, 5, 6, 7, 8, 9))
 def single_transmitter_random_search(
     propagation: Propagation,
     coordinate: Coordinate,
-    receivers: Receivers,
-    frequency: float,
-    init_x_position: float,
-    init_y_position: float,
+    receivers_key: Array,
+    shadowing_key: Array,
+    transmitter_key: Array,
+    transmitter_number: int,
+    receiver_number: int,
+    noise_floor: float,
+    bandwidth: float,
     evaluation_function: JitWrapped,
-    seed: int,
-    number: int,
-) -> tuple[int, float, float]:
+) -> tuple[int, float, float, float]:
     data_rate: DataRate = propagation.create_data_rate(
         coordinate=coordinate,
-        receivers=receivers,
-        frequency=frequency,
-        init_x_position=init_x_position,
-        init_y_position=init_y_position,
+        receivers_key=receivers_key,
+        shadowing_key=shadowing_key,
+        receiver_number=receiver_number,
+        noise_floor=noise_floor,
+        bandwidth=bandwidth,
     )
     transmitter_function: JitWrapped = data_rate.create_single_transmitter_function()
-    min_distance = jnp.asarray(0, dtype=integer)
-    data_rate_error = jnp.asarray(0, dtype=integer)
+
     x_indices, y_indices = coordinate.create_random_transmitter_indices(
-        seed=seed,
-        number=number,
+        key=transmitter_key,
+        number=transmitter_number,
     )
-    each_data_rate: Array = transmitter_function(
-        x_indices=x_indices,
-        y_indices=y_indices,
+    max_data_rate: Array = evaluation_function(
+        data_rate=transmitter_function(
+            x_indices=x_indices,
+            y_indices=y_indices,
+        ),
     )
-    output_train_data: Array = evaluation_function(
-        data_rate=each_data_rate,
-        axis=1,
+    max_data_rate_index: tuple[Array, ...] = jnp.unravel_index(
+        indices=jnp.argmax(max_data_rate),
+        shape=max_data_rate.shape,
     )
-    final_train_data_index: tuple[Array, ...] = jnp.unravel_index(
-        indices=jnp.argmax(output_train_data),
-        shape=output_train_data.shape,
-    )
-    final_x_position, final_y_position = (
+    max_x_position, max_y_position = (
         coordinate.convert_indices_to_transmitter_positions(
-            x_indices=x_indices[final_train_data_index[0]],
-            y_indices=y_indices[final_train_data_index[0]],
+            x_indices=x_indices[max_data_rate_index[0]],
+            y_indices=y_indices[max_data_rate_index[0]],
         )
     )
-    max_x_indices, max_y_indices = data_rate.get_true_single_transmitter_indices(
+    true_x_indices, true_y_indices = data_rate.get_true_single_transmitter_indices(
         evaluation_function=evaluation_function
     )
-    max_x_positions, max_y_positions = (
+    true_x_positions, true_y_positions = (
         coordinate.convert_indices_to_transmitter_positions(
-            x_indices=max_x_indices,
-            y_indices=max_y_indices,
+            x_indices=true_x_indices,
+            y_indices=true_y_indices,
         )
     )
     each_distances: Array = get_distance(
-        x_positions_a=max_x_positions,
-        y_positions_a=max_y_positions,
-        x_positions_b=final_x_position,
-        y_positions_b=final_y_position,
+        x_positions_a=true_x_positions,
+        y_positions_a=true_y_positions,
+        x_positions_b=max_x_position,
+        y_positions_b=max_y_position,
     )
     min_distance: Array = each_distances.min()
-    each_max_data_rate: Array = transmitter_function(max_x_indices, max_y_indices)
-    max_data_rate: Array = evaluation_function(data_rate=each_max_data_rate, axis=0)
-    data_rate_error: Array = max_data_rate - output_train_data.max()
+
+    true_data_rate: Array = evaluation_function(
+        data_rate=transmitter_function(
+            x_indices=true_x_indices,
+            y_indices=true_y_indices,
+        )
+    )
+    data_rate_absolute_error: Array = true_data_rate.max() - max_data_rate.max()
+    data_rate_relative_error: Array = data_rate_absolute_error / true_data_rate.max()
     return (
-        number,
-        float(min_distance.block_until_ready()),
-        float(data_rate_error.block_until_ready()),
+        transmitter_number,
+        float(min_distance),
+        float(data_rate_absolute_error),
+        float(data_rate_relative_error),
     )
 
 
