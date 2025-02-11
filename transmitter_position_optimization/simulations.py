@@ -1,3 +1,5 @@
+from typing import Literal
+
 import jax.numpy as jnp
 from bayesian_optimization.acquisition import Acquisition
 from bayesian_optimization.kernel.exponential_kernel import (
@@ -70,31 +72,50 @@ from simulation.triple import (
 
 
 def single_transmitter_simulations() -> None:
+    # 座標の設定
     coordinate = Coordinate(
+        # 大きさ[m]
         x_size=20.0,
         y_size=20.0,
+        # 受信機のメッシュ数
         x_mesh=40,
         y_mesh=40,
     )
     propagation = Propagation(
+        # 自由空間伝搬距離[m]
         free_distance=1.0,
+        # 伝搬係数
         propagation_coefficient=3.0,
+        # 相関距離
         distance_correlation=10.0,
+        # シャドウイングの標準偏差
         standard_deviation=8.0,
+        # 周波数[Hz]
         frequency=2.4e9,
+        # 送信機の初期位置
         init_transmitter_x_position=jnp.asarray(coordinate.x_size / 2.0),
         init_transmitter_y_position=jnp.asarray(coordinate.y_size / 2.0),
     )
+    # 受信機の数
     receiver_number: int = 5
+    # ノイズフロア[dBm]
     noise_floor: float = -90.0
-    bandwidth: float = 1.0e6
+    # 帯域幅[Hz]
+    bandwidth: float = 20.0e6
+    # シミュレーション回数
     simulation_number: int = 1000
+    # 獲得関数
     acquisition_function: JitWrapped = Acquisition.ucb()
+    # 評価関数（最適な位置の基準）
     evaluation_function: JitWrapped = Evaluation.min
-    init_train_indices_type: str = "grid"
+    # 送信機の初期位置のパターン（グリッド状に配置orランダムに配置）
+    init_train_indices_type: Literal["random", "grid"] = "grid"
+    # 送信機の初期位置をランダムしたときの送信機の数
     init_train_indices_random_number = 4
+    # 送信機の初期位置をグリッド状にしたときの1辺の送信機の数
     init_train_indices_grid_number = 2
 
+    # ランダムサーチによるシミュレーション
     single_transmitter_rs_simulation(
         propagation=propagation,
         coordinate=coordinate,
@@ -105,6 +126,7 @@ def single_transmitter_simulations() -> None:
         evaluation_function=evaluation_function,
         simulation_number=simulation_number,
     )
+    # 受信機からの位置推定によるシミュレーション
     single_transmitter_de_simulation(
         propagation=propagation,
         coordinate=coordinate,
@@ -115,8 +137,11 @@ def single_transmitter_simulations() -> None:
         simulation_number=simulation_number,
     )
 
+    # ガウスカーネル
     kernel: Kernel = GaussianTwoDimKernel()
+    # 対数ランダムサーチの範囲
     lower_bound, upper_bound = GaussianTwoDimKernel.log_random_search_range()
+    # パラメータ最適化（対数ランダムサーチ->MCMC->MCMC）
     parameter_optimization: ParameterOptimization = MCMC(
         std_params=lambda sp: sp / 100.0,
         count=1000,
@@ -134,6 +159,7 @@ def single_transmitter_simulations() -> None:
         ),
     )
 
+    # ベイズ最適化によるシミュレーション
     single_transmitter_bo_simulation(
         propagation=propagation,
         coordinate=coordinate,
@@ -488,11 +514,11 @@ def double_transmitter_simulations() -> None:
     )
     receiver_number: int = 5
     noise_floor: float = -90.0
-    bandwidth: float = 1.0e6
+    bandwidth: float = 20.0e6
     simulation_number: int = 1000
     acquisition_function: JitWrapped = Acquisition.ucb()
     evaluation_function: JitWrapped = Evaluation.min
-    init_train_indices_type: str = "grid"
+    init_train_indices_type: Literal["random", "grid"] = "grid"
     init_train_indices_random_number = 4**2
     init_train_indices_grid_number = 2
 
@@ -892,11 +918,11 @@ def triple_transmitter_simulations() -> None:
     )
     receiver_number: int = 5
     noise_floor: float = -90.0
-    bandwidth: float = 1.0e6
+    bandwidth: float = 20.0e6
     simulation_number: int = 1000
     acquisition_function: JitWrapped = Acquisition.ucb()
     evaluation_function: JitWrapped = Evaluation.min
-    init_train_indices_type: str = "grid"
+    init_train_indices_type: Literal["random", "grid"] = "grid"
     init_train_indices_random_number = 4**3
     init_train_indices_grid_number = 2
 
