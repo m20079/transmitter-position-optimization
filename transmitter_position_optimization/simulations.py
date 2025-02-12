@@ -115,234 +115,74 @@ def single_transmitter_simulations() -> None:
     # 送信機の初期位置をグリッド状にしたときの1辺の送信機の数
     init_train_indices_grid_number = 2
 
-    # ランダムサーチによるシミュレーション
-    single_transmitter_rs_simulation(
-        propagation=propagation,
-        coordinate=coordinate,
-        transmitter_number=coordinate.x_mesh,
-        receiver_number=receiver_number,
-        noise_floor=noise_floor,
-        bandwidth=bandwidth,
-        evaluation_function=evaluation_function,
-        simulation_number=simulation_number,
-    )
-    # 受信機からの位置推定によるシミュレーション
-    single_transmitter_de_simulation(
-        propagation=propagation,
-        coordinate=coordinate,
-        receiver_number=receiver_number,
-        noise_floor=noise_floor,
-        bandwidth=bandwidth,
-        evaluation_function=evaluation_function,
-        simulation_number=simulation_number,
-    )
+    # # ランダムサーチによるシミュレーション
+    # single_transmitter_rs_simulation(
+    #     propagation=propagation,
+    #     coordinate=coordinate,
+    #     transmitter_number=coordinate.x_mesh,
+    #     receiver_number=receiver_number,
+    #     noise_floor=noise_floor,
+    #     bandwidth=bandwidth,
+    #     evaluation_function=evaluation_function,
+    #     simulation_number=simulation_number,
+    # )
+    # # 受信機からの位置推定によるシミュレーション
+    # single_transmitter_de_simulation(
+    #     propagation=propagation,
+    #     coordinate=coordinate,
+    #     receiver_number=receiver_number,
+    #     noise_floor=noise_floor,
+    #     bandwidth=bandwidth,
+    #     evaluation_function=evaluation_function,
+    #     simulation_number=simulation_number,
+    # )
 
-    # ガウスカーネル
-    kernel: Kernel = GaussianTwoDimKernel()
-    # 対数ランダムサーチの範囲
-    lower_bound, upper_bound = GaussianTwoDimKernel.log_random_search_range()
-    # パラメータ最適化（対数ランダムサーチ->MCMC->MCMC->MCMC）
-    parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
-        count=1000,
-        seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
-            seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
-        ),
-    )
+    # # ガウスカーネル
+    # kernel: Kernel = GaussianTwoDimKernel()
+    # # 対数ランダムサーチの範囲
+    # lower_bound, upper_bound = GaussianTwoDimKernel.log_random_search_range()
+    # # パラメータ最適化（対数ランダムサーチ->MCMC->MCMC->MCMC）
+    # parameter_optimization: ParameterOptimization = MCMC(
+    #     std_params=lambda sp: sp / 100.0,
+    #     count=1000,
+    #     seed=0,
+    #     parameter_optimization=MCMC(
+    #         std_params=lambda sp: sp / 10.0,
+    #         count=1000,
+    #         seed=0,
+    #         parameter_optimization=MCMC(
+    #             std_params=lambda sp: sp,
+    #             count=1000,
+    #             seed=0,
+    #             parameter_optimization=LogRandomSearch(
+    #                 lower_bound=lower_bound,
+    #                 upper_bound=upper_bound,
+    #                 count=10000,
+    #                 seed=0,
+    #             ),
+    #         ),
+    #     ),
+    # )
 
-    # ベイズ最適化によるシミュレーション
-    single_transmitter_bo_simulation(
-        propagation=propagation,
-        coordinate=coordinate,
-        receiver_number=receiver_number,
-        noise_floor=noise_floor,
-        bandwidth=bandwidth,
-        kernel=kernel,
-        parameter_optimization=parameter_optimization,
-        evaluation_function=evaluation_function,
-        acquisition_function=acquisition_function,
-        simulation_number=simulation_number,
-        init_train_indices_type=init_train_indices_type,
-        init_train_indices_random_number=init_train_indices_random_number,
-        init_train_indices_grid_number=init_train_indices_grid_number,
-    )
+    # # ベイズ最適化によるシミュレーション
+    # single_transmitter_bo_simulation(
+    #     propagation=propagation,
+    #     coordinate=coordinate,
+    #     receiver_number=receiver_number,
+    #     noise_floor=noise_floor,
+    #     bandwidth=bandwidth,
+    #     kernel=kernel,
+    #     parameter_optimization=parameter_optimization,
+    #     evaluation_function=evaluation_function,
+    #     acquisition_function=acquisition_function,
+    #     simulation_number=simulation_number,
+    #     init_train_indices_type=init_train_indices_type,
+    #     init_train_indices_random_number=init_train_indices_random_number,
+    #     init_train_indices_grid_number=init_train_indices_grid_number,
+    # )
 
-    kernel: Kernel = Matern5TwoDimKernel()
-    lower_bound, upper_bound = Matern5TwoDimKernel.log_random_search_range()
-    parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
-        count=1000,
-        seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
-            seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
-        ),
-    )
-
-    single_transmitter_bo_simulation(
-        propagation=propagation,
-        coordinate=coordinate,
-        receiver_number=receiver_number,
-        noise_floor=noise_floor,
-        bandwidth=bandwidth,
-        kernel=kernel,
-        parameter_optimization=parameter_optimization,
-        evaluation_function=evaluation_function,
-        acquisition_function=acquisition_function,
-        simulation_number=simulation_number,
-        init_train_indices_type=init_train_indices_type,
-        init_train_indices_random_number=init_train_indices_random_number,
-        init_train_indices_grid_number=init_train_indices_grid_number,
-    )
-
-    kernel: Kernel = Matern3TwoDimKernel()
-    lower_bound, upper_bound = Matern3TwoDimKernel.log_random_search_range()
-    parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
-        count=1000,
-        seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
-            seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
-        ),
-    )
-
-    single_transmitter_bo_simulation(
-        propagation=propagation,
-        coordinate=coordinate,
-        receiver_number=receiver_number,
-        noise_floor=noise_floor,
-        bandwidth=bandwidth,
-        kernel=kernel,
-        parameter_optimization=parameter_optimization,
-        evaluation_function=evaluation_function,
-        acquisition_function=acquisition_function,
-        simulation_number=simulation_number,
-        init_train_indices_type=init_train_indices_type,
-        init_train_indices_random_number=init_train_indices_random_number,
-        init_train_indices_grid_number=init_train_indices_grid_number,
-    )
-
-    kernel: Kernel = ExponentialTwoDimKernel()
-    lower_bound, upper_bound = ExponentialTwoDimKernel.log_random_search_range()
-    parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
-        count=1000,
-        seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
-            seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
-        ),
-    )
-
-    single_transmitter_bo_simulation(
-        propagation=propagation,
-        coordinate=coordinate,
-        receiver_number=receiver_number,
-        noise_floor=noise_floor,
-        bandwidth=bandwidth,
-        kernel=kernel,
-        parameter_optimization=parameter_optimization,
-        evaluation_function=evaluation_function,
-        acquisition_function=acquisition_function,
-        simulation_number=simulation_number,
-        init_train_indices_type=init_train_indices_type,
-        init_train_indices_random_number=init_train_indices_random_number,
-        init_train_indices_grid_number=init_train_indices_grid_number,
-    )
-
-    kernel: Kernel = RationalQuadraticTwoDimKernel()
-    lower_bound, upper_bound = RationalQuadraticTwoDimKernel.log_random_search_range()
-    parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
-        count=1000,
-        seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
-            seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
-        ),
-    )
-
-    single_transmitter_bo_simulation(
-        propagation=propagation,
-        coordinate=coordinate,
-        receiver_number=receiver_number,
-        noise_floor=noise_floor,
-        bandwidth=bandwidth,
-        kernel=kernel,
-        parameter_optimization=parameter_optimization,
-        evaluation_function=evaluation_function,
-        acquisition_function=acquisition_function,
-        simulation_number=simulation_number,
-        init_train_indices_type=init_train_indices_type,
-        init_train_indices_random_number=init_train_indices_random_number,
-        init_train_indices_grid_number=init_train_indices_grid_number,
-    )
-
-    # kernel: Kernel = GaussianPolynomialTwoDimKernel(1)
-    # lower_bound, upper_bound = GaussianPolynomialTwoDimKernel.log_random_search_range()
+    # kernel: Kernel = Matern5TwoDimKernel()
+    # lower_bound, upper_bound = Matern5TwoDimKernel.log_random_search_range()
     # parameter_optimization: ParameterOptimization = MCMC(
     #     std_params=lambda sp: sp / 100.0,
     #     count=1000,
@@ -381,8 +221,8 @@ def single_transmitter_simulations() -> None:
     #     init_train_indices_grid_number=init_train_indices_grid_number,
     # )
 
-    # kernel: Kernel = Matern3PolynomialTwoDimKernel(1)
-    # lower_bound, upper_bound = Matern3PolynomialTwoDimKernel.log_random_search_range()
+    # kernel: Kernel = Matern3TwoDimKernel()
+    # lower_bound, upper_bound = Matern3TwoDimKernel.log_random_search_range()
     # parameter_optimization: ParameterOptimization = MCMC(
     #     std_params=lambda sp: sp / 100.0,
     #     count=1000,
@@ -421,8 +261,8 @@ def single_transmitter_simulations() -> None:
     #     init_train_indices_grid_number=init_train_indices_grid_number,
     # )
 
-    # kernel: Kernel = Matern5PolynomialTwoDimKernel(1)
-    # lower_bound, upper_bound = Matern5PolynomialTwoDimKernel.log_random_search_range()
+    # kernel: Kernel = ExponentialTwoDimKernel()
+    # lower_bound, upper_bound = ExponentialTwoDimKernel.log_random_search_range()
     # parameter_optimization: ParameterOptimization = MCMC(
     #     std_params=lambda sp: sp / 100.0,
     #     count=1000,
@@ -461,10 +301,8 @@ def single_transmitter_simulations() -> None:
     #     init_train_indices_grid_number=init_train_indices_grid_number,
     # )
 
-    # kernel: Kernel = ExponentialPolynomialTwoDimKernel(1)
-    # lower_bound, upper_bound = (
-    #     ExponentialPolynomialTwoDimKernel.log_random_search_range()
-    # )
+    # kernel: Kernel = RationalQuadraticTwoDimKernel()
+    # lower_bound, upper_bound = RationalQuadraticTwoDimKernel.log_random_search_range()
     # parameter_optimization: ParameterOptimization = MCMC(
     #     std_params=lambda sp: sp / 100.0,
     #     count=1000,
@@ -503,47 +341,209 @@ def single_transmitter_simulations() -> None:
     #     init_train_indices_grid_number=init_train_indices_grid_number,
     # )
 
-    # kernel: Kernel = RationalQuadraticPolynomialTwoDimKernel(1)
-    # lower_bound, upper_bound = (
-    #     RationalQuadraticPolynomialTwoDimKernel.log_random_search_range()
-    # )
-    # parameter_optimization: ParameterOptimization = MCMC(
-    #     std_params=lambda sp: sp / 100.0,
-    #     count=1000,
-    #     seed=0,
-    #     parameter_optimization=MCMC(
-    #         std_params=lambda sp: sp / 10.0,
-    #         count=1000,
-    #         seed=0,
-    #         parameter_optimization=MCMC(
-    #             std_params=lambda sp: sp,
-    #             count=1000,
-    #             seed=0,
-    #             parameter_optimization=LogRandomSearch(
-    #                 lower_bound=lower_bound,
-    #                 upper_bound=upper_bound,
-    #                 count=10000,
-    #                 seed=0,
-    #             ),
-    #         ),
-    #     ),
-    # )
+    kernel: Kernel = GaussianPolynomialTwoDimKernel(1)
+    lower_bound, upper_bound = GaussianPolynomialTwoDimKernel.log_random_search_range()
+    parameter_optimization: ParameterOptimization = MCMC(
+        std_params=lambda sp: sp / 100.0,
+        count=1000,
+        seed=0,
+        parameter_optimization=MCMC(
+            std_params=lambda sp: sp / 10.0,
+            count=1000,
+            seed=0,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
+                seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
+            ),
+        ),
+    )
 
-    # single_transmitter_bo_simulation(
-    #     propagation=propagation,
-    #     coordinate=coordinate,
-    #     receiver_number=receiver_number,
-    #     noise_floor=noise_floor,
-    #     bandwidth=bandwidth,
-    #     kernel=kernel,
-    #     parameter_optimization=parameter_optimization,
-    #     evaluation_function=evaluation_function,
-    #     acquisition_function=acquisition_function,
-    #     simulation_number=simulation_number,
-    #     init_train_indices_type=init_train_indices_type,
-    #     init_train_indices_random_number=init_train_indices_random_number,
-    #     init_train_indices_grid_number=init_train_indices_grid_number,
-    # )
+    single_transmitter_bo_simulation(
+        propagation=propagation,
+        coordinate=coordinate,
+        receiver_number=receiver_number,
+        noise_floor=noise_floor,
+        bandwidth=bandwidth,
+        kernel=kernel,
+        parameter_optimization=parameter_optimization,
+        evaluation_function=evaluation_function,
+        acquisition_function=acquisition_function,
+        simulation_number=simulation_number,
+        init_train_indices_type=init_train_indices_type,
+        init_train_indices_random_number=init_train_indices_random_number,
+        init_train_indices_grid_number=init_train_indices_grid_number,
+    )
+
+    kernel: Kernel = Matern3PolynomialTwoDimKernel(1)
+    lower_bound, upper_bound = Matern3PolynomialTwoDimKernel.log_random_search_range()
+    parameter_optimization: ParameterOptimization = MCMC(
+        std_params=lambda sp: sp / 100.0,
+        count=1000,
+        seed=0,
+        parameter_optimization=MCMC(
+            std_params=lambda sp: sp / 10.0,
+            count=1000,
+            seed=0,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
+                seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
+            ),
+        ),
+    )
+
+    single_transmitter_bo_simulation(
+        propagation=propagation,
+        coordinate=coordinate,
+        receiver_number=receiver_number,
+        noise_floor=noise_floor,
+        bandwidth=bandwidth,
+        kernel=kernel,
+        parameter_optimization=parameter_optimization,
+        evaluation_function=evaluation_function,
+        acquisition_function=acquisition_function,
+        simulation_number=simulation_number,
+        init_train_indices_type=init_train_indices_type,
+        init_train_indices_random_number=init_train_indices_random_number,
+        init_train_indices_grid_number=init_train_indices_grid_number,
+    )
+
+    kernel: Kernel = Matern5PolynomialTwoDimKernel(1)
+    lower_bound, upper_bound = Matern5PolynomialTwoDimKernel.log_random_search_range()
+    parameter_optimization: ParameterOptimization = MCMC(
+        std_params=lambda sp: sp / 100.0,
+        count=1000,
+        seed=0,
+        parameter_optimization=MCMC(
+            std_params=lambda sp: sp / 10.0,
+            count=1000,
+            seed=0,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
+                seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
+            ),
+        ),
+    )
+
+    single_transmitter_bo_simulation(
+        propagation=propagation,
+        coordinate=coordinate,
+        receiver_number=receiver_number,
+        noise_floor=noise_floor,
+        bandwidth=bandwidth,
+        kernel=kernel,
+        parameter_optimization=parameter_optimization,
+        evaluation_function=evaluation_function,
+        acquisition_function=acquisition_function,
+        simulation_number=simulation_number,
+        init_train_indices_type=init_train_indices_type,
+        init_train_indices_random_number=init_train_indices_random_number,
+        init_train_indices_grid_number=init_train_indices_grid_number,
+    )
+
+    kernel: Kernel = ExponentialPolynomialTwoDimKernel(1)
+    lower_bound, upper_bound = (
+        ExponentialPolynomialTwoDimKernel.log_random_search_range()
+    )
+    parameter_optimization: ParameterOptimization = MCMC(
+        std_params=lambda sp: sp / 100.0,
+        count=1000,
+        seed=0,
+        parameter_optimization=MCMC(
+            std_params=lambda sp: sp / 10.0,
+            count=1000,
+            seed=0,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
+                seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
+            ),
+        ),
+    )
+
+    single_transmitter_bo_simulation(
+        propagation=propagation,
+        coordinate=coordinate,
+        receiver_number=receiver_number,
+        noise_floor=noise_floor,
+        bandwidth=bandwidth,
+        kernel=kernel,
+        parameter_optimization=parameter_optimization,
+        evaluation_function=evaluation_function,
+        acquisition_function=acquisition_function,
+        simulation_number=simulation_number,
+        init_train_indices_type=init_train_indices_type,
+        init_train_indices_random_number=init_train_indices_random_number,
+        init_train_indices_grid_number=init_train_indices_grid_number,
+    )
+
+    kernel: Kernel = RationalQuadraticPolynomialTwoDimKernel(1)
+    lower_bound, upper_bound = (
+        RationalQuadraticPolynomialTwoDimKernel.log_random_search_range()
+    )
+    parameter_optimization: ParameterOptimization = MCMC(
+        std_params=lambda sp: sp / 100.0,
+        count=1000,
+        seed=0,
+        parameter_optimization=MCMC(
+            std_params=lambda sp: sp / 10.0,
+            count=1000,
+            seed=0,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
+                seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
+            ),
+        ),
+    )
+
+    single_transmitter_bo_simulation(
+        propagation=propagation,
+        coordinate=coordinate,
+        receiver_number=receiver_number,
+        noise_floor=noise_floor,
+        bandwidth=bandwidth,
+        kernel=kernel,
+        parameter_optimization=parameter_optimization,
+        evaluation_function=evaluation_function,
+        acquisition_function=acquisition_function,
+        simulation_number=simulation_number,
+        init_train_indices_type=init_train_indices_type,
+        init_train_indices_random_number=init_train_indices_random_number,
+        init_train_indices_grid_number=init_train_indices_grid_number,
+    )
 
 
 def double_transmitter_simulations() -> None:
