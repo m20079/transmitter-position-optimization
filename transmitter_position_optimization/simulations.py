@@ -119,7 +119,7 @@ def single_transmitter_simulations() -> None:
     single_transmitter_rs_simulation(
         propagation=propagation,
         coordinate=coordinate,
-        transmitter_number=coordinate.x_mesh,
+        transmitter_number=20,
         receiver_number=receiver_number,
         noise_floor=noise_floor,
         bandwidth=bandwidth,
@@ -575,7 +575,7 @@ def double_transmitter_simulations() -> None:
     double_transmitter_rs_simulation(
         propagation=propagation,
         coordinate=coordinate,
-        transmitter_number=coordinate.x_mesh,
+        transmitter_number=40,
         receiver_number=receiver_number,
         noise_floor=noise_floor,
         bandwidth=bandwidth,
@@ -1029,7 +1029,7 @@ def triple_transmitter_simulations() -> None:
     triple_transmitter_rs_simulation(
         propagation=propagation,
         coordinate=coordinate,
-        transmitter_number=coordinate.x_mesh,
+        transmitter_number=60,
         receiver_number=receiver_number,
         noise_floor=noise_floor,
         bandwidth=bandwidth,
