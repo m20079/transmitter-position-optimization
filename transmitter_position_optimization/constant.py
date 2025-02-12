@@ -4,8 +4,8 @@ import jax.numpy as jnp
 
 platforms: Final[str] = "cuda"
 
-integer: Final = jnp.int64
-floating: Final = jnp.float64
+integer: Final = jnp.int32
+floating: Final = jnp.float32
 
 
 # 0: fori_loop →　vmap
@@ -26,4 +26,4 @@ std_delta: Final[float] = 1.0e-5
 max_log_likelihood: Final[float] = 0.0
 
 # data rate unit: bps → Mbps, Gbps
-data_rate_unit: Final[float] = 1.0e-6
+data_rate_unit: Final[float] = 1.0e-9
