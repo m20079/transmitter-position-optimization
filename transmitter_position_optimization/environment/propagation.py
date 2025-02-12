@@ -3,7 +3,7 @@ from typing import Any, Self
 
 import jax
 import jax.numpy as jnp
-from constant import data_rate_generation, floating
+from constant import data_rate_generation, data_rate_unit, floating
 from environment.coordinate import Coordinate
 from environment.data_rate import DataRate
 from environment.distance import get_distance
@@ -168,7 +168,7 @@ class Propagation:
             )
             / 10.0
         )
-        return receivers.bandwidth * jnp.log2(1.0 + snr) * 1.0e-6
+        return receivers.bandwidth * jnp.log2(1.0 + snr) * data_rate_unit
 
     @partial(jax.jit, static_argnums=(3, 4, 5, 6))
     def create_data_rate(

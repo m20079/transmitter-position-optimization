@@ -23,3 +23,6 @@ std_delta: Final[float] = 1.0e-5
 
 # max log likelihood
 max_log_likelihood: Final[float] = 0.0
+
+# data rate unit: bps → Mbps, Gbps
+data_rate_unit: Final[float] = 1.0e-6
