@@ -173,7 +173,7 @@ def double_transmitter_rs_simulation(
             )
         )
 
-        count.append(result[0])
+        count.append(int(result[0]))
         distance_error_a.append(float(result[1].block_until_ready()))
         distance_error_b.append(float(result[2].block_until_ready()))
         distance_error.append(float(result[3].block_until_ready()))
@@ -184,7 +184,7 @@ def double_transmitter_rs_simulation(
             f"simulation {debug_name}: {seed + 1}",
             flush=True,
         )
-        print(f"count: {result[0]}", flush=True)
+        print(f"count: {int(result[0])}", flush=True)
         print(f"distance_error_a: {float(result[1].block_until_ready())}", flush=True)
         print(f"distance_error_b: {float(result[2].block_until_ready())}", flush=True)
         print(f"distance_error: {float(result[3].block_until_ready())}", flush=True)

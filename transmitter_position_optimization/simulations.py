@@ -141,20 +141,25 @@ def single_transmitter_simulations() -> None:
     kernel: Kernel = GaussianTwoDimKernel()
     # 対数ランダムサーチの範囲
     lower_bound, upper_bound = GaussianTwoDimKernel.log_random_search_range()
-    # パラメータ最適化（対数ランダムサーチ->MCMC->MCMC）
+    # パラメータ最適化（対数ランダムサーチ->MCMC->MCMC->MCMC）
     parameter_optimization: ParameterOptimization = MCMC(
         std_params=lambda sp: sp / 100.0,
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -183,14 +188,19 @@ def single_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -218,14 +228,19 @@ def single_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -253,14 +268,19 @@ def single_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -288,14 +308,19 @@ def single_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -323,14 +348,19 @@ def single_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -358,14 +388,19 @@ def single_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -393,14 +428,19 @@ def single_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -430,14 +470,19 @@ def single_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -467,14 +512,19 @@ def single_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -542,14 +592,19 @@ def double_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -577,14 +632,19 @@ def double_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -612,14 +672,19 @@ def double_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -649,14 +714,19 @@ def double_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -686,14 +756,19 @@ def double_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -723,14 +798,19 @@ def double_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -760,14 +840,19 @@ def double_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -797,14 +882,19 @@ def double_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -834,14 +924,19 @@ def double_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -871,14 +966,19 @@ def double_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -946,14 +1046,19 @@ def triple_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -983,14 +1088,19 @@ def triple_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -1020,14 +1130,19 @@ def triple_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -1057,14 +1172,19 @@ def triple_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -1096,14 +1216,19 @@ def triple_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -1133,14 +1258,19 @@ def triple_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -1170,14 +1300,19 @@ def triple_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -1207,14 +1342,19 @@ def triple_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -1244,14 +1384,19 @@ def triple_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )
@@ -1283,14 +1428,19 @@ def triple_transmitter_simulations() -> None:
         count=1000,
         seed=0,
         parameter_optimization=MCMC(
-            std_params=lambda sp: sp,
+            std_params=lambda sp: sp / 10.0,
             count=1000,
             seed=0,
-            parameter_optimization=LogRandomSearch(
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-                count=10000,
+            parameter_optimization=MCMC(
+                std_params=lambda sp: sp,
+                count=1000,
                 seed=0,
+                parameter_optimization=LogRandomSearch(
+                    lower_bound=lower_bound,
+                    upper_bound=upper_bound,
+                    count=10000,
+                    seed=0,
+                ),
             ),
         ),
     )

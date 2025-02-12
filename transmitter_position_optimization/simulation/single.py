@@ -140,7 +140,7 @@ def single_transmitter_de_simulation(
             )
         )
 
-        count.append(result[0])
+        count.append(int(result[0]))
         distance_error.append(float(result[1].block_until_ready()))
         data_rate_absolute_error.append(float(result[2].block_until_ready()))
         data_rate_relative_error.append(float(result[3].block_until_ready()))
@@ -149,7 +149,7 @@ def single_transmitter_de_simulation(
             f"simulation {debug_name}: {seed + 1}",
             flush=True,
         )
-        print(f"count: {result[0]}", flush=True)
+        print(f"count: {int(result[0])}", flush=True)
         print(f"distance_error: {float(result[1].block_until_ready())}", flush=True)
         print(
             f"data_rate_absolute_error: {float(result[2].block_until_ready())}",
@@ -213,7 +213,7 @@ def single_transmitter_rs_simulation(
             evaluation_function=evaluation_function,
         )
 
-        count.append(result[0])
+        count.append(int(result[0]))
         distance_error.append(float(result[1].block_until_ready()))
         data_rate_absolute_error.append(float(result[2].block_until_ready()))
         data_rate_relative_error.append(float(result[3].block_until_ready()))
@@ -222,7 +222,7 @@ def single_transmitter_rs_simulation(
             f"simulation {debug_name}: {seed + 1}",
             flush=True,
         )
-        print(f"count: {result[0]}", flush=True)
+        print(f"count: {int(result[0])}", flush=True)
         print(f"distance_error: {float(result[1].block_until_ready())}", flush=True)
         print(
             f"data_rate_absolute_error: {float(result[2].block_until_ready())}",
