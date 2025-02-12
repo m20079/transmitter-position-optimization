@@ -15,6 +15,6 @@ if __name__ == "__main__":
         integer == jnp.int64 and floating == jnp.float64,
     )
 
-    # single_transmitter_simulations()
-    double_transmitter_simulations()
+    single_transmitter_simulations()
+    # double_transmitter_simulations()
     # triple_transmitter_simulations()
