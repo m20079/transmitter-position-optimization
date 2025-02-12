@@ -2,7 +2,7 @@ from typing import Final
 
 import jax.numpy as jnp
 
-platforms: Final[str] = "cpu"
+platforms: Final[str] = "cuda"
 
 integer: Final = jnp.int64
 floating: Final = jnp.float64

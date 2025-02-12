@@ -16,5 +16,5 @@ if __name__ == "__main__":
     )
 
     single_transmitter_simulations()
-    double_transmitter_simulations()
-    triple_transmitter_simulations()
+    # double_transmitter_simulations()
+    # triple_transmitter_simulations()
