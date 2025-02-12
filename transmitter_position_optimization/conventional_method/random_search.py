@@ -86,6 +86,7 @@ def single_transmitter_random_search(
     )
 
 
+@partial(jax.jit, static_argnums=(0, 1, 5, 6, 7, 8, 9))
 def double_transmitter_random_search(
     propagation: Propagation,
     coordinate: Coordinate,
@@ -201,6 +202,7 @@ def double_transmitter_random_search(
     )
 
 
+@partial(jax.jit, static_argnums=(0, 1, 5, 6, 7, 8, 9))
 def triple_transmitter_random_search(
     propagation: Propagation,
     coordinate: Coordinate,

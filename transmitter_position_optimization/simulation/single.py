@@ -191,9 +191,7 @@ def single_transmitter_rs_simulation(
     data_rate_absolute_error: list[float] = []
     data_rate_relative_error: list[float] = []
 
-    debug_name: str = (
-        f"random_search_{transmitter_number}_{evaluation_function.__qualname__}"
-    )
+    debug_name: str = f"single_transmitter_random_search_{transmitter_number}_{evaluation_function.__qualname__}"
 
     for seed in range(simulation_number):
         receivers_key, shadowing_key, transmitter_key = random.split(

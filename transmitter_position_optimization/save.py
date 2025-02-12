@@ -10,7 +10,7 @@ def save_result(
     distance_error_a: list[float] | None = None,
     distance_error_b: list[float] | None = None,
     distance_error_c: list[float] | None = None,
-):
+) -> None:
     jnp.savez(
         f"{debug_name}.npz",
         count=count,
