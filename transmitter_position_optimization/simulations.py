@@ -116,26 +116,26 @@ def single_transmitter_simulations() -> None:
     init_train_indices_grid_number = 2
 
     # ランダムサーチによるシミュレーション
-    single_transmitter_rs_simulation(
-        propagation=propagation,
-        coordinate=coordinate,
-        transmitter_number=20,
-        receiver_number=receiver_number,
-        noise_floor=noise_floor,
-        bandwidth=bandwidth,
-        evaluation_function=evaluation_function,
-        simulation_number=simulation_number,
-    )
+    # single_transmitter_rs_simulation(
+    #     propagation=propagation,
+    #     coordinate=coordinate,
+    #     transmitter_number=20,
+    #     receiver_number=receiver_number,
+    #     noise_floor=noise_floor,
+    #     bandwidth=bandwidth,
+    #     evaluation_function=evaluation_function,
+    #     simulation_number=simulation_number,
+    # )
     # 受信機からの位置推定によるシミュレーション
-    single_transmitter_de_simulation(
-        propagation=propagation,
-        coordinate=coordinate,
-        receiver_number=receiver_number,
-        noise_floor=noise_floor,
-        bandwidth=bandwidth,
-        evaluation_function=evaluation_function,
-        simulation_number=simulation_number,
-    )
+    # single_transmitter_de_simulation(
+    #     propagation=propagation,
+    #     coordinate=coordinate,
+    #     receiver_number=receiver_number,
+    #     noise_floor=noise_floor,
+    #     bandwidth=bandwidth,
+    #     evaluation_function=evaluation_function,
+    #     simulation_number=simulation_number,
+    # )
 
     # ガウスカーネル
     kernel: Kernel = GaussianTwoDimKernel()
@@ -143,24 +143,14 @@ def single_transmitter_simulations() -> None:
     lower_bound, upper_bound = GaussianTwoDimKernel.log_random_search_range()
     # パラメータ最適化（対数ランダムサーチ->MCMC->MCMC->MCMC）
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -184,24 +174,14 @@ def single_transmitter_simulations() -> None:
     kernel: Kernel = Matern5TwoDimKernel()
     lower_bound, upper_bound = Matern5TwoDimKernel.log_random_search_range()
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -224,24 +204,14 @@ def single_transmitter_simulations() -> None:
     kernel: Kernel = Matern3TwoDimKernel()
     lower_bound, upper_bound = Matern3TwoDimKernel.log_random_search_range()
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -264,24 +234,14 @@ def single_transmitter_simulations() -> None:
     kernel: Kernel = ExponentialTwoDimKernel()
     lower_bound, upper_bound = ExponentialTwoDimKernel.log_random_search_range()
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -304,24 +264,14 @@ def single_transmitter_simulations() -> None:
     kernel: Kernel = RationalQuadraticTwoDimKernel()
     lower_bound, upper_bound = RationalQuadraticTwoDimKernel.log_random_search_range()
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -344,24 +294,14 @@ def single_transmitter_simulations() -> None:
     kernel: Kernel = GaussianPolynomialTwoDimKernel(1)
     lower_bound, upper_bound = GaussianPolynomialTwoDimKernel.log_random_search_range()
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -384,24 +324,14 @@ def single_transmitter_simulations() -> None:
     kernel: Kernel = Matern3PolynomialTwoDimKernel(1)
     lower_bound, upper_bound = Matern3PolynomialTwoDimKernel.log_random_search_range()
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -424,24 +354,14 @@ def single_transmitter_simulations() -> None:
     kernel: Kernel = Matern5PolynomialTwoDimKernel(1)
     lower_bound, upper_bound = Matern5PolynomialTwoDimKernel.log_random_search_range()
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -466,24 +386,14 @@ def single_transmitter_simulations() -> None:
         ExponentialPolynomialTwoDimKernel.log_random_search_range()
     )
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -508,24 +418,14 @@ def single_transmitter_simulations() -> None:
         RationalQuadraticPolynomialTwoDimKernel.log_random_search_range()
     )
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -572,40 +472,30 @@ def double_transmitter_simulations() -> None:
     init_train_indices_random_number = 4**2
     init_train_indices_grid_number = 2
 
-    double_transmitter_rs_simulation(
-        propagation=propagation,
-        coordinate=coordinate,
-        transmitter_number=40,
-        receiver_number=receiver_number,
-        noise_floor=noise_floor,
-        bandwidth=bandwidth,
-        evaluation_function=evaluation_function,
-        simulation_number=simulation_number,
-    )
+    # double_transmitter_rs_simulation(
+    #     propagation=propagation,
+    #     coordinate=coordinate,
+    #     transmitter_number=40,
+    #     receiver_number=receiver_number,
+    #     noise_floor=noise_floor,
+    #     bandwidth=bandwidth,
+    #     evaluation_function=evaluation_function,
+    #     simulation_number=simulation_number,
+    # )
 
     kernel: Kernel = GaussianPlusGaussianFourDimKernel()
     lower_bound, upper_bound = (
         GaussianPlusGaussianFourDimKernel.log_random_search_range()
     )
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -628,24 +518,14 @@ def double_transmitter_simulations() -> None:
     kernel: Kernel = Matern5PlusMatern5FourDimKernel()
     lower_bound, upper_bound = Matern5PlusMatern5FourDimKernel.log_random_search_range()
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -668,24 +548,14 @@ def double_transmitter_simulations() -> None:
     kernel: Kernel = Matern3PlusMatern3FourDimKernel()
     lower_bound, upper_bound = Matern3PlusMatern3FourDimKernel.log_random_search_range()
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -710,24 +580,14 @@ def double_transmitter_simulations() -> None:
         ExponentialPlusExponentialFourDimKernel.log_random_search_range()
     )
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -752,24 +612,14 @@ def double_transmitter_simulations() -> None:
         RationalQuadraticPlusRationalQuadraticFourDimKernel.log_random_search_range()
     )
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -794,24 +644,14 @@ def double_transmitter_simulations() -> None:
         GaussianTimesGaussianFourDimKernel.log_random_search_range()
     )
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -836,24 +676,14 @@ def double_transmitter_simulations() -> None:
         Matern3TimesMatern3FourDimKernel.log_random_search_range()
     )
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -878,24 +708,14 @@ def double_transmitter_simulations() -> None:
         Matern5TimesMatern5FourDimKernel.log_random_search_range()
     )
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -920,24 +740,14 @@ def double_transmitter_simulations() -> None:
         ExponentialTimesExponentialFourDimKernel.log_random_search_range()
     )
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -962,24 +772,14 @@ def double_transmitter_simulations() -> None:
         RationalQuadraticTimesRationalQuadraticFourDimKernel.log_random_search_range()
     )
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -1042,24 +842,14 @@ def triple_transmitter_simulations() -> None:
         GaussianPlusGaussianPlusGaussianSixDimKernel.log_random_search_range()
     )
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -1084,24 +874,14 @@ def triple_transmitter_simulations() -> None:
         Matern5PlusMatern5PlusMatern5SixDimKernel.log_random_search_range()
     )
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -1126,24 +906,14 @@ def triple_transmitter_simulations() -> None:
         Matern3PlusMatern3PlusMatern3SixDimKernel.log_random_search_range()
     )
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -1168,24 +938,14 @@ def triple_transmitter_simulations() -> None:
         ExponentialPlusExponentialPlusExponentialSixDimKernel.log_random_search_range()
     )
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -1212,24 +972,14 @@ def triple_transmitter_simulations() -> None:
         RationalQuadraticPlusRationalQuadraticPlusRationalQuadraticSixDimKernel.log_random_search_range()
     )
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -1254,24 +1004,14 @@ def triple_transmitter_simulations() -> None:
         GaussianTimesGaussianTimesGaussianSixDimKernel.log_random_search_range()
     )
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -1296,24 +1036,14 @@ def triple_transmitter_simulations() -> None:
         Matern3TimesMatern3TimesMatern3SixDimKernel.log_random_search_range()
     )
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -1338,24 +1068,14 @@ def triple_transmitter_simulations() -> None:
         Matern5TimesMatern5TimesMatern5SixDimKernel.log_random_search_range()
     )
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -1380,24 +1100,14 @@ def triple_transmitter_simulations() -> None:
         ExponentialTimesExponentialTimesExponentialSixDimKernel.log_random_search_range()
     )
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
@@ -1424,24 +1134,14 @@ def triple_transmitter_simulations() -> None:
         RationalQuadraticTimesRationalQuadraticTimesRationalQuadraticSixDimKernel.log_random_search_range()
     )
     parameter_optimization: ParameterOptimization = MCMC(
-        std_params=lambda sp: sp / 100.0,
+        std_params=lambda std_params: std_params,
         count=1000,
         seed=0,
-        parameter_optimization=MCMC(
-            std_params=lambda sp: sp / 10.0,
-            count=1000,
+        parameter_optimization=LogRandomSearch(
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            count=10000,
             seed=0,
-            parameter_optimization=MCMC(
-                std_params=lambda sp: sp,
-                count=1000,
-                seed=0,
-                parameter_optimization=LogRandomSearch(
-                    lower_bound=lower_bound,
-                    upper_bound=upper_bound,
-                    count=10000,
-                    seed=0,
-                ),
-            ),
         ),
     )
 
