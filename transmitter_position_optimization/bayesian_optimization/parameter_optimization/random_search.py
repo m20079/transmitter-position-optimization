@@ -50,6 +50,9 @@ class RandomSearch(ParameterOptimization):
     ) -> Array:
         keys: Array = random.split(random.key(self.seed), self.lower_bound.size)
 
+        # 以下のような書き方もできる
+        # lower_bound, upper_bound = kernel.random_search_range()
+
         parameter: Array = jax.vmap(
             lambda key, min_param, max_param: random.uniform(
                 key,

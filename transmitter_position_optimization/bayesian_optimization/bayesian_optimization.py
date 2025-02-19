@@ -264,12 +264,15 @@ def double_transmitter_bayesian_optimization(
                     dtype=floating,
                 ),
             )
+            import jax
+
             acquisition: Array = acquisition_function(
                 mean=mean.reshape(x_transmitter_positions.shape),
                 std=std.reshape(x_transmitter_positions.shape),
                 max=output_train_data.max(),
                 count=count,
             )
+            jax.debug.print("mean:{}", acquisition)
             next_index: tuple[Array, ...] = jnp.unravel_index(
                 indices=jnp.argmax(acquisition),
                 shape=acquisition.shape,
@@ -332,6 +335,7 @@ def double_transmitter_bayesian_optimization(
             true_indices: Array = impure_true_indices[
                 jnp.all(impure_true_indices != -1, axis=1)
             ]
+            print(true_indices)
             true_x_positions_a, true_y_positions_a = (
                 coordinate.convert_indices_to_transmitter_positions(
                     x_indices=true_indices.T.at[0].get(),
@@ -361,6 +365,7 @@ def double_transmitter_bayesian_optimization(
                 indices=jnp.argmin(each_distance),
                 shape=each_distance.shape,
             )
+            print(each_distance)
             min_distance_a: Array = each_distance_a[min_distance_index[0]]
             min_distance_b: Array = each_distance_b[min_distance_index[0]]
             min_distance: Array = jnp.sqrt(min_distance_a**2.0 + min_distance_b**2.0)

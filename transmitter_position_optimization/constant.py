@@ -2,7 +2,7 @@ from typing import Final
 
 import jax.numpy as jnp
 
-platforms: Final[str] = "cuda"
+platforms: Final[str] = "cpu"
 
 integer: Final = jnp.int32
 floating: Final = jnp.float32
@@ -26,4 +26,4 @@ std_delta: Final[float] = 1.0e-5
 max_log_likelihood: Final[float] = 0.0
 
 # data rate unit: bps → Mbps, Gbps
-data_rate_unit: Final[float] = 1.0e-9
+data_rate_unit: Final[float] = 1.0e-6
