@@ -116,26 +116,26 @@ def single_transmitter_simulations() -> None:
     init_train_indices_grid_number = 2
 
     # ランダムサーチによるシミュレーション
-    # single_transmitter_rs_simulation(
-    #     propagation=propagation,
-    #     coordinate=coordinate,
-    #     transmitter_number=20,
-    #     receiver_number=receiver_number,
-    #     noise_floor=noise_floor,
-    #     bandwidth=bandwidth,
-    #     evaluation_function=evaluation_function,
-    #     simulation_number=simulation_number,
-    # )
+    single_transmitter_rs_simulation(
+        propagation=propagation,
+        coordinate=coordinate,
+        transmitter_number=20,
+        receiver_number=receiver_number,
+        noise_floor=noise_floor,
+        bandwidth=bandwidth,
+        evaluation_function=evaluation_function,
+        simulation_number=simulation_number,
+    )
     # 受信機からの位置推定によるシミュレーション
-    # single_transmitter_de_simulation(
-    #     propagation=propagation,
-    #     coordinate=coordinate,
-    #     receiver_number=receiver_number,
-    #     noise_floor=noise_floor,
-    #     bandwidth=bandwidth,
-    #     evaluation_function=evaluation_function,
-    #     simulation_number=simulation_number,
-    # )
+    single_transmitter_de_simulation(
+        propagation=propagation,
+        coordinate=coordinate,
+        receiver_number=receiver_number,
+        noise_floor=noise_floor,
+        bandwidth=bandwidth,
+        evaluation_function=evaluation_function,
+        simulation_number=simulation_number,
+    )
 
     # ガウスカーネル
     kernel: Kernel = GaussianTwoDimKernel()
@@ -472,16 +472,16 @@ def double_transmitter_simulations() -> None:
     init_train_indices_random_number = 4**2
     init_train_indices_grid_number = 2
 
-    # double_transmitter_rs_simulation(
-    #     propagation=propagation,
-    #     coordinate=coordinate,
-    #     transmitter_number=40,
-    #     receiver_number=receiver_number,
-    #     noise_floor=noise_floor,
-    #     bandwidth=bandwidth,
-    #     evaluation_function=evaluation_function,
-    #     simulation_number=simulation_number,
-    # )
+    double_transmitter_rs_simulation(
+        propagation=propagation,
+        coordinate=coordinate,
+        transmitter_number=40,
+        receiver_number=receiver_number,
+        noise_floor=noise_floor,
+        bandwidth=bandwidth,
+        evaluation_function=evaluation_function,
+        simulation_number=simulation_number,
+    )
 
     kernel: Kernel = GaussianPlusGaussianFourDimKernel()
     lower_bound, upper_bound = (
